@@ -1,0 +1,6 @@
+Add these imports into app/models/__init__.py:
+
+from .nhif_claim_batch import NHIFClaimBatch
+from .nhif_claim import NHIFClaim
+from .nhif_collection import NHIFCollection
+from .nhif_rejection import NHIFRejection
