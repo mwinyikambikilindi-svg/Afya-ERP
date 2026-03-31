@@ -1,6 +1,8 @@
-Add these imports into app/models/__init__.py:
+Add this block into create_app() after other route registrations:
 
-from .nhif_claim_batch import NHIFClaimBatch
-from .nhif_claim import NHIFClaim
-from .nhif_collection import NHIFCollection
-from .nhif_rejection import NHIFRejection
+    try:
+        from app.nhif_routes import register_nhif_routes
+        register_nhif_routes(flask_app)
+        flask_app.logger.info("NHIF routes registered.")
+    except Exception as e:
+        flask_app.logger.warning("NHIF routes not registered: %s", e)
