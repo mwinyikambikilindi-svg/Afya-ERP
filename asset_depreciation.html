@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Depreciation Runs - AFYA ERP{% endblock %}
+{% block page_title %}Depreciation Runs{% endblock %}
+{% block page_subtitle %}Asset Management{% endblock %}
+
+{% block content %}
+
+<form method="post" class="page-card">
+  <h2 class="section-title">Run Depreciation</h2>{% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}{% if success %}<div class="alert alert-success">Processed {{ success }}</div>{% endif %}
+  <div class="form-grid-3"><div><label>Run Date</label><input type="date" name="run_date" value="{{ default_run_date }}"></div><div><label>Period Label</label><input name="period_label" placeholder="e.g. Mar 2026" required></div><div><label>Remarks</label><input name="remarks"></div></div><div class="button-row"><button type="submit" name="action" value="save">Save Draft</button><button type="submit" name="action" value="post">Approve & Post</button></div>
+</form>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th>No</th><th>Date</th><th>Period</th><th>Status</th><th>Action</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.run_no }}</td><td>{{ row.run_date }}</td><td>{{ row.period_label }}</td><td>{{ row.status }}</td><td>{% if row.status != 'posted' %}<form method="post" action="/asset-depreciation/{{ row.id }}/approve"><button type="submit">Approve</button></form>{% endif %}</td></tr>{% else %}<tr><td colspan="5">No depreciation runs found.</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% endblock %}

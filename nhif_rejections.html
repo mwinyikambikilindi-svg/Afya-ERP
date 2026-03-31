@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}NHIF Rejections - AFYA ERP{% endblock %}
+{% block page_title %}NHIF Rejections / Losses{% endblock %}
+{% block page_subtitle %}Capture NHIF rejected amounts and loss reasons{% endblock %}
+{% block content %}
+<div class="page-card">
+  <h2 class="section-title">New NHIF Rejection / Loss</h2>
+  {% if error_message %}<div class="message error">{{ error_message }}</div>{% endif %}
+  <form method="post">
+    <div class="form-grid-3">
+      <div>
+        <label>Claim</label>
+        <select name="claim_id" required>
+          <option value="">-- Select Claim --</option>
+          {% for row in rows %}
+          <option value="{{ row.id }}">{{ row.facility_name }} | {{ row.claim_month }} | {{ row.nhif_reference or row.id }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div><label>Rejection Date</label><input type="date" name="rejection_date" value="{{ today }}" required></div>
+      <div><label>Amount Rejected</label><input type="text" name="amount_rejected" required></div>
+      <div style="grid-column: span 3;">
+        <label>Rejection Reason</label>
+        <textarea name="rejection_reason" rows="3" required></textarea>
+      </div>
+    </div>
+    <div class="form-actions"><button type="submit">Save Rejection / Loss</button></div>
+  </form>
+</div>
+
+{% if posting_preview %}
+<div class="page-card" style="margin-top:16px;">
+  <h2 class="section-title">Posting Preview</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Entry Type</th><th>Debit</th><th>Credit</th><th>Amount</th><th>Reason</th></tr></thead>
+      <tbody>
+        {% for e in posting_preview.entries %}
+        <tr>
+          <td>{{ e.entry_type }}</td>
+          <td>{{ e.debit_account }}</td>
+          <td>{{ e.credit_account }}</td>
+          <td>TZS {{ "{:,.2f}".format(e.amount or 0) }}</td>
+          <td>{{ posting_preview.rejection_reason }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

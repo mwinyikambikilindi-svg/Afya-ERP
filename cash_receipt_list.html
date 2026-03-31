@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Cash Receipt Register - AFYA ERP{% endblock %}
+{% block page_title %}Cash Receipt Register{% endblock %}
+{% block page_subtitle %}Review captured receipts and their posting status{% endblock %}
+
+{% block content %}
+<div class="page-card">
+    <h2 class="section-title">Filters</h2>
+
+    <form method="get">
+        <div class="form-grid-2">
+            <div>
+                <label for="status">Status</label>
+                <select name="status" id="status">
+                    <option value="">-- All --</option>
+                    <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>Draft</option>
+                    <option value="posted" {% if selected_status == 'posted' %}selected{% endif %}>Posted</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="receipt_type">Receipt Type</label>
+                <select name="receipt_type" id="receipt_type">
+                    <option value="">-- All --</option>
+                    <option value="CASH" {% if selected_receipt_type == 'CASH' %}selected{% endif %}>Cash</option>
+                    <option value="BANK" {% if selected_receipt_type == 'BANK' %}selected{% endif %}>Bank</option>
+                    <option value="TRANSFER" {% if selected_receipt_type == 'TRANSFER' %}selected{% endif %}>Transfer</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit">Apply Filters</button>
+    </form>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Receipts</div>
+        <div class="stat-value">{{ total_rows }}</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Receipt No</th>
+                    <th>Date</th>
+                    <th>Branch</th>
+                    <th>Type</th>
+                    <th>Payer</th>
+                    <th>Cash/Bank Account</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th>Total Amount</th>
+                    <th>Open</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for receipt in receipts %}
+                <tr>
+                    <td>{{ receipt.id }}</td>
+                    <td>{{ receipt.receipt_no }}</td>
+                    <td>{{ receipt.receipt_date }}</td>
+                    <td>{{ receipt.branch_code }} - {{ receipt.branch_name }}</td>
+                    <td>{{ receipt.receipt_type }}</td>
+                    <td>
+                        {% if receipt.payer_name %}
+                            {{ receipt.payer_code }} - {{ receipt.payer_name }}
+                        {% endif %}
+                    </td>
+                    <td>{{ receipt.cash_account_code }} - {{ receipt.cash_account_name }}</td>
+                    <td>{{ receipt.reference_no or '' }}</td>
+                    <td>
+                        {% if receipt.status == 'posted' %}
+                            <span class="badge badge-success">Posted</span>
+                        {% else %}
+                            <span class="badge badge-warning">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ receipt.total_amount }}</td>
+                    <td><a href="/cash-receipts/{{ receipt.id }}">Open</a></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="11">No cash receipts found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

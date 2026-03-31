@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Journal Detail - AFYA ERP{% endblock %}
+{% block page_title %}Journal Detail{% endblock %}
+{% block page_subtitle %}Review journal header, lines and balancing status{% endblock %}
+
+{% block content %}
+{% if error_message %}
+<div class="page-card" style="border-left:4px solid #c62828; margin-bottom:20px;">
+    <strong>Error:</strong> {{ error_message }}
+</div>
+{% endif %}
+
+<div class="page-card" style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+    <div>
+        <a href="/journals" class="btn btn-secondary">Back to Journals</a>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        {% if session.get('role_name') in ['ADMIN', 'ACCOUNTANT'] and journal.status in ['draft', 'rejected'] %}
+        <form method="POST" action="/journals/{{ journal.id }}/submit" style="display:inline;">
+            <button type="submit" class="btn btn-warning">Submit for Approval</button>
+        </form>
+        {% endif %}
+
+        {% if session.get('role_name') == 'ADMIN' and journal.status != 'posted' %}
+        <form method="POST" action="/journals/{{ journal.id }}/post" style="display:inline;">
+            <button type="submit" class="btn btn-success">Approve &amp; Post</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid-2" style="margin-bottom:20px;">
+    <div class="page-card">
+        <h2 class="section-title">Journal Header</h2>
+        <div><strong>Batch No:</strong> {{ journal.batch_no }}</div>
+        <div><strong>Date:</strong> {{ journal.journal_date }}</div>
+        <div><strong>Status:</strong>
+            {% if journal.status == 'posted' %}
+                <span class="badge badge-success">Posted</span>
+            {% elif journal.status == 'pending_approval' %}
+                <span class="badge badge-warning">Pending Approval</span>
+            {% elif journal.status == 'rejected' %}
+                <span class="badge badge-danger">Rejected</span>
+            {% else %}
+                <span class="badge badge-warning">Draft</span>
+            {% endif %}
+        </div>
+        <div><strong>Branch:</strong> {{ journal.branch_code }} - {{ journal.branch_name }}</div>
+        <div><strong>Source Module:</strong> {{ journal.source_module }}</div>
+        <div><strong>Reference No:</strong> {{ journal.reference_no or '' }}</div>
+    </div>
+
+    <div class="page-card">
+        <h2 class="section-title">Summary</h2>
+        <div><strong>Total Debit:</strong> {{ total_debit }}</div>
+        <div><strong>Total Credit:</strong> {{ total_credit }}</div>
+        <div style="margin-top:10px;">
+            {% if is_balanced %}
+                <span class="badge badge-success">Balanced</span>
+            {% else %}
+                <span class="badge badge-danger">Not Balanced</span>
+            {% endif %}
+        </div>
+        <div style="margin-top:14px;"><strong>Narration:</strong></div>
+        <div class="muted">{{ journal.narration or '' }}</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="page-card" style="box-shadow:none; border:none; padding-bottom:0;">
+        <h2 class="section-title">Journal Lines</h2>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Account Code</th>
+                    <th>Account Name</th>
+                    <th>Description</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in lines %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ line.account_code }}</td>
+                    <td>{{ line.account_name }}</td>
+                    <td>{{ line.description or '' }}</td>
+                    <td>{{ line.debit_amount }}</td>
+                    <td>{{ line.credit_amount }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">No journal lines found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

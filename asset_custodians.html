@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Custodians - AFYA ERP{% endblock %}
+{% block page_title %}Asset Custodians{% endblock %}
+{% block page_subtitle %}Asset Management{% endblock %}
+
+{% block content %}
+
+<form method="post" class="page-card">
+  <h2 class="section-title">New Asset Custodian</h2>{% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}{% if success %}<div class="alert alert-success">Saved successfully.</div>{% endif %}
+  <div class="form-grid-4"><div><label>Employee No</label><input name="employee_no"></div><div><label>Full Name</label><input name="full_name" required></div><div><label>Phone</label><input name="phone"></div><div><label>Email</label><input name="email"></div></div><button type="submit">Save Custodian</button>
+</form>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th>Employee No</th><th>Full Name</th><th>Phone</th><th>Email</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.employee_no or '' }}</td><td>{{ row.full_name }}</td><td>{{ row.phone or '' }}</td><td>{{ row.email or '' }}</td></tr>{% else %}<tr><td colspan="4">No custodians found.</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% endblock %}

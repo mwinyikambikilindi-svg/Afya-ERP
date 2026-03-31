@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - AFYA ERP{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Smart command centre for finance, college fees and asset operations{% endblock %}
+{% block workspace_actions %}
+<a href="/manual-journal" class="btn btn-secondary">New Journal</a>
+<a href="/cash-receipts/new" class="btn btn-secondary">New Receipt</a>
+<a href="/cash-payments/new" class="btn btn-secondary">New Payment</a>
+{% endblock %}
+{% block content %}
+{% set revenue = (summary.total_revenue if summary else 0) | float %}
+{% set expenditure = (summary.total_expenditure if summary else 0) | float %}
+{% set net_position = (summary.net_position if summary else 0) | float %}
+{% set student_receivables = (summary.student_receivables if summary else 0) | float %}
+{% set chart_max = [revenue, expenditure, (net_position if net_position > 0 else 0), student_receivables, 1] | max %}
+
+<div class="notice-ribbons">
+    <a href="/trial-balance" class="notice-ribbon">Trial Balance</a>
+    <a href="/student-aging" class="notice-ribbon notice-ribbon--info">Student Aging</a>
+    <a href="/asset-reports" class="notice-ribbon">Asset Reports</a>
+    <a href="/student-approvals" class="notice-ribbon">Approvals Queue</a>
+</div>
+
+<div class="page-card">
+    <div class="panel-header panel-header--tight">
+        <div>
+            <h3 class="panel-title">Command Center Overview</h3>
+            <div class="panel-subtitle">Live system-wide operational summary from your real data</div>
+        </div>
+        <div class="compact-pillbar compact-pillbar--soft">
+            <span class="compact-pill">User: {{ full_name or '-' }}</span>
+            <span class="compact-pill">Branch: {{ branch_name or '-' }}</span>
+            <span class="compact-pill">Role: {{ session.get('role_name') or '-' }}</span>
+            <span class="compact-pill">F/Y: {{ current_fiscal_year.year_name if current_fiscal_year else '-' }}</span>
+        </div>
+    </div>
+
+    <div class="stats-grid stats-grid--compact">
+        <div class="command-kpi">
+            <div class="command-kpi__label">Total Revenue (TZS)</div>
+            <div class="command-kpi__value">{{ "{:,.2f}".format(summary.total_revenue or 0) }}</div>
+            <div class="command-kpi__sub">Posted receipts in selected range</div>
+        </div>
+        <div class="command-kpi kpi-danger">
+            <div class="command-kpi__label">Total Expenditure (TZS)</div>
+            <div class="command-kpi__value">{{ "{:,.2f}".format(summary.total_expenditure or 0) }}</div>
+            <div class="command-kpi__sub">Posted payments in selected range</div>
+        </div>
+        <div class="command-kpi kpi-success">
+            <div class="command-kpi__label">Net Position</div>
+            <div class="command-kpi__value">{{ "{:,.2f}".format(summary.net_position or 0) }}</div>
+            <div class="command-kpi__sub">Revenue less expenditure</div>
+        </div>
+        <div class="command-kpi kpi-cyan">
+            <div class="command-kpi__label">Student Receivables</div>
+            <div class="command-kpi__value">{{ "{:,.2f}".format(summary.student_receivables or 0) }}</div>
+            <div class="command-kpi__sub">Outstanding collectible balances</div>
+        </div>
+        <div class="command-kpi">
+            <div class="command-kpi__label">Pending Approvals</div>
+            <div class="command-kpi__value">{{ summary.total_pending_approvals or 0 }}</div>
+            <div class="command-kpi__sub">Items waiting for action</div>
+        </div>
+        <div class="command-kpi">
+            <div class="command-kpi__label">Active Assets</div>
+            <div class="command-kpi__value">{{ summary.active_assets or 0 }}</div>
+            <div class="command-kpi__sub">Assets in service</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid-2 dashboard-grid-2--visual">
+    <div class="command-panel">
+        <div class="panel-header panel-header--tight">
+            <h3 class="panel-title">Finance Snapshot</h3>
+            <div class="panel-subtitle">Live comparison of key balances</div>
+        </div>
+        <div class="mini-chart-stack">
+            <div class="mini-bar-row">
+                <div class="mini-bar-row__label">Revenue</div>
+                <div class="mini-bar-track"><div class="mini-bar-fill mini-bar-fill--blue" style="width: {{ ((revenue / chart_max) * 100) | round(1) }}%;"></div></div>
+                <div class="mini-bar-row__value">{{ "{:,.0f}".format(summary.total_revenue or 0) }}</div>
+            </div>
+            <div class="mini-bar-row">
+                <div class="mini-bar-row__label">Expenditure</div>
+                <div class="mini-bar-track"><div class="mini-bar-fill mini-bar-fill--red" style="width: {{ ((expenditure / chart_max) * 100) | round(1) }}%;"></div></div>
+                <div class="mini-bar-row__value">{{ "{:,.0f}".format(summary.total_expenditure or 0) }}</div>
+            </div>
+            <div class="mini-bar-row">
+                <div class="mini-bar-row__label">Net Position</div>
+                <div class="mini-bar-track"><div class="mini-bar-fill mini-bar-fill--green" style="width: {{ (((net_position if net_position > 0 else 0) / chart_max) * 100) | round(1) }}%;"></div></div>
+                <div class="mini-bar-row__value">{{ "{:,.0f}".format(summary.net_position or 0) }}</div>
+            </div>
+            <div class="mini-bar-row">
+                <div class="mini-bar-row__label">Student Receivables</div>
+                <div class="mini-bar-track"><div class="mini-bar-fill mini-bar-fill--blue" style="width: {{ ((student_receivables / chart_max) * 100) | round(1) }}%;"></div></div>
+                <div class="mini-bar-row__value">{{ "{:,.0f}".format(summary.student_receivables or 0) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="command-panel">
+        <div class="panel-header panel-header--tight">
+            <h3 class="panel-title">Priority Alerts</h3>
+            <div class="panel-subtitle">Live issues needing attention</div>
+        </div>
+        <div class="info-list info-list--dense">
+            {% if summary.high_alerts %}
+                {% for alert in summary.high_alerts %}
+                <div class="info-row">
+                    <div class="info-label"><a href="{{ alert.route }}">{{ alert.label }}</a></div>
+                    <div>
+                        <span class="badge {% if alert.tone == 'danger' %}badge-danger{% elif alert.tone == 'warning' %}badge-warning{% else %}badge-info{% endif %}">{{ alert.count }}</span>
+                        {% if alert.amount is not none %}
+                        <span style="margin-left:8px;">TZS {{ "{:,.2f}".format(alert.amount or 0) }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="info-row"><div class="info-label">Status</div><div><span class="badge badge-success">No critical alerts</span></div></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid-2">
+    <div class="command-panel">
+        <div class="panel-header panel-header--tight">
+            <h3 class="panel-title">Approvals Queue</h3>
+            <div class="panel-subtitle">Cross-module review workload</div>
+        </div>
+        <div class="info-list info-list--dense">
+            {% if summary.approvals_queue %}
+                {% for item in summary.approvals_queue %}
+                <div class="info-row">
+                    <div class="info-label"><a href="{{ item.route }}">{{ item.label }}</a></div>
+                    <div><span class="badge badge-warning">{{ item.count }}</span></div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="info-row"><div class="info-label">Status</div><div><span class="badge badge-success">Queue is clear</span></div></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="command-panel">
+        <div class="panel-header panel-header--tight">
+            <h3 class="panel-title">Student Receivables Aging</h3>
+            <div class="panel-subtitle">Outstanding balances by bucket</div>
+        </div>
+        <div class="info-list info-list--dense">
+            {% if summary.aging_buckets %}
+                {% for bucket in summary.aging_buckets %}
+                <div class="info-row">
+                    <div class="info-label">{{ bucket.bucket }}</div>
+                    <div>{{ bucket.invoice_count }} invoices · TZS {{ "{:,.2f}".format(bucket.balance or 0) }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="info-row"><div class="info-label">Status</div><div>No aging balances available yet.</div></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid-2">
+    <div class="command-panel">
+        <div class="panel-header panel-header--tight">
+            <h3 class="panel-title">Monthly Trend</h3>
+            <div class="panel-subtitle">Posted receipts and payments by month</div>
+        </div>
+        {% if summary.monthly_series %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Revenue</th>
+                        <th>Expenditure</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in summary.monthly_series %}
+                    <tr>
+                        <td>{{ item.label }}</td>
+                        <td>{{ "{:,.2f}".format(item.revenue or 0) }}</td>
+                        <td>{{ "{:,.2f}".format(item.expenditure or 0) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="info-list"><div class="info-row"><div class="info-label">Status</div><div>No monthly posted movement found in the selected period.</div></div></div>
+        {% endif %}
+    </div>
+
+    <div class="command-panel">
+        <div class="panel-header panel-header--tight">
+            <h3 class="panel-title">Recent Student Activity</h3>
+            <div class="panel-subtitle">Latest invoice and payment movements</div>
+        </div>
+        <div class="info-list info-list--dense">
+            {% if summary.recent_student_activity %}
+                {% for item in summary.recent_student_activity %}
+                <div class="info-row">
+                    <div class="info-label">{{ item.item_type }} · {{ item.ref_no }}</div>
+                    <div>{{ item.action_date }} · {{ "{:,.2f}".format(item.amount or 0) }} · <span class="badge badge-info">{{ item.status }}</span></div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="info-row"><div class="info-label">Status</div><div>No recent student activity found.</div></div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid-2">
+    <div class="command-panel">
+        <div class="panel-header panel-header--tight">
+            <h3 class="panel-title">Student Finance Snapshot</h3>
+            <div class="panel-subtitle">Collection discipline at a glance</div>
+        </div>
+        <div class="info-list info-list--dense">
+            <div class="info-row"><div class="info-label">Overdue Students</div><div>{{ summary.student_overdue_count or 0 }}</div></div>
+            <div class="info-row"><div class="info-label">Overdue Amount</div><div>TZS {{ "{:,.2f}".format(summary.student_overdue_amount or 0) }}</div></div>
+            <div class="info-row"><div class="info-label">Unallocated Cash Count</div><div>{{ summary.student_unallocated_count or 0 }}</div></div>
+            <div class="info-row"><div class="info-label">Unallocated Cash</div><div>TZS {{ "{:,.2f}".format(summary.student_unallocated_amount or 0) }}</div></div>
+        </div>
+    </div>
+
+    <div class="command-panel">
+        <div class="panel-header panel-header--tight">
+            <h3 class="panel-title">Asset Snapshot</h3>
+            <div class="panel-subtitle">Current asset base</div>
+        </div>
+        <div class="info-list info-list--dense">
+            <div class="info-row"><div class="info-label">Asset Cost Base</div><div>TZS {{ "{:,.2f}".format(summary.total_assets_cost or 0) }}</div></div>
+            <div class="info-row"><div class="info-label">Active Assets</div><div>{{ summary.active_assets or 0 }}</div></div>
+            <div class="info-row"><div class="info-label">Disposed / Retired</div><div>{{ summary.disposed_assets or 0 }}</div></div>
+            <div class="info-row"><div class="info-label">Active Facilities</div><div>{{ summary.active_facilities or 0 }}</div></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

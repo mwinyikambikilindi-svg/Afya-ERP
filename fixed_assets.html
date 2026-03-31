@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Asset Register - AFYA ERP{% endblock %}
+{% block page_title %}Asset Register{% endblock %}
+{% block page_subtitle %}Asset management through compact enterprise windows{% endblock %}
+{% block workspace_actions %}
+<button type="button" data-modal-target="#assetRegisterModal">Register Asset</button>
+{% endblock %}
+{% block content %}
+{% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}
+{% if success %}<div class="alert alert-success">Asset saved successfully.</div>{% endif %}
+
+<div class="workspace-window">
+    <div class="window-toolbar">
+        <div>
+            <h2 class="window-title">Fixed Asset Register</h2>
+            <div class="window-subtitle">Register assets in a popup while keeping the asset list visible.</div>
+        </div>
+        <div class="compact-pillbar">
+            <span class="compact-pill">Cost Tracking</span>
+            <span class="compact-pill">Depreciation</span>
+            <span class="compact-pill">Custodian</span>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Code</th><th>Name</th><th>Cost</th><th>Accum. Dep</th><th>Carrying</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row.asset_code }}</td>
+                    <td>{{ row.asset_name }}</td>
+                    <td>{{ row.cost }}</td>
+                    <td>{{ row.accumulated_depreciation }}</td>
+                    <td>{{ row.carrying_amount }}</td>
+                    <td>{{ row.status }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6">No assets found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="enterprise-modal {% if error_message %}is-open{% endif %}" id="assetRegisterModal" {% if error_message %}data-auto-open="true"{% endif %}>
+  <div class="modal-window modal-window--wide">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Register New Asset</h3>
+        <div class="modal-subtitle">Compact asset registration window</div>
+      </div>
+      <button type="button" class="modal-close btn btn-secondary" data-modal-close>×</button>
+    </div>
+    <div class="modal-body">
+      <form method="post">
+        <div class="form-grid-4">
+          <div><label>Asset Code</label><input name="asset_code" required></div>
+          <div><label>Asset Name</label><input name="asset_name" required></div>
+          <div><label>Category</label><select name="category_id" required><option value="">-- Select --</option>{% for c in categories %}<option value="{{ c.id }}">{{ c.code }} - {{ c.name }}</option>{% endfor %}</select></div>
+          <div><label>Branch</label><select name="branch_id"><option value="">-- Select --</option>{% for b in branches %}<option value="{{ b.id }}">{{ b.code }} - {{ b.name }}</option>{% endfor %}</select></div>
+          <div><label>Location</label><select name="location_id"><option value="">-- Select --</option>{% for l in locations %}<option value="{{ l.id }}">{{ l.code }} - {{ l.name }}</option>{% endfor %}</select></div>
+          <div><label>Custodian</label><select name="custodian_id"><option value="">-- Select --</option>{% for c in custodians %}<option value="{{ c.id }}">{{ c.full_name }}</option>{% endfor %}</select></div>
+          <div><label>Acquisition Date</label><input type="date" name="acquisition_date" value="{{ default_acquisition_date }}"></div>
+          <div><label>Capitalization Date</label><input type="date" name="capitalization_date" value="{{ default_acquisition_date }}"></div>
+          <div><label>Cost</label><input name="cost" required></div>
+          <div><label>Salvage Value</label><input name="salvage_value" value="0"></div>
+          <div><label>Useful Life (Months)</label><input name="useful_life_months" value="60"></div>
+          <div><label>Funding Source</label><input name="funding_source"></div>
+          <div style="grid-column: span 4;"><label>Description</label><textarea name="description"></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
+          <button type="submit">Register Asset</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Acquisitions - AFYA ERP{% endblock %}
+{% block page_title %}Asset Acquisitions{% endblock %}
+{% block page_subtitle %}Asset Management{% endblock %}
+
+{% block content %}
+
+<form method="post" class="page-card">
+  <h2 class="section-title">New Asset Acquisition</h2>{% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}{% if success %}<div class="alert alert-success">Processed {{ success }}</div>{% endif %}
+  <div class="form-grid-4">
+    <div><label>Asset</label><select name="fixed_asset_id" required><option value="">-- Select --</option>{% for a in assets %}<option value="{{ a.id }}">{{ a.asset_code }} - {{ a.asset_name }}</option>{% endfor %}</select></div>
+    <div><label>Acquisition Date</label><input type="date" name="acquisition_date" value="{{ default_acquisition_date }}"></div>
+    <div><label>Supplier</label><select name="supplier_id"><option value="">-- Select --</option>{% for s in suppliers %}<option value="{{ s.id }}">{{ s.code }} - {{ s.name }}</option>{% endfor %}</select></div>
+    <div><label>Payment GL</label><select name="payment_account_id"><option value="">-- Select --</option>{% for a in cash_accounts %}<option value="{{ a.id }}">{{ a.code }} - {{ a.name }}</option>{% endfor %}</select></div>
+    <div><label>Amount</label><input name="amount" required></div>
+    <div><label>Reference</label><input name="reference_no"></div>
+    <div style="grid-column: span 2;"><label>Remarks</label><input name="remarks"></div>
+  </div>
+  <div class="button-row"><button type="submit" name="action" value="save">Save Draft</button><button type="submit" name="action" value="post">Approve & Post</button></div>
+</form>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th>No</th><th>Date</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.acquisition_no }}</td><td>{{ row.acquisition_date }}</td><td>{{ row.amount }}</td><td>{{ row.status }}</td><td>{% if row.status != 'posted' %}<form method="post" action="/asset-acquisitions/{{ row.id }}/approve"><button type="submit">Approve</button></form>{% endif %}</td></tr>{% else %}<tr><td colspan="5">No acquisitions found.</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% endblock %}

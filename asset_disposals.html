@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Disposals - AFYA ERP{% endblock %}
+{% block page_title %}Asset Disposals{% endblock %}
+{% block page_subtitle %}Asset Management{% endblock %}
+
+{% block content %}
+
+<form method="post" class="page-card">
+  <h2 class="section-title">Asset Disposal</h2>{% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}{% if success %}<div class="alert alert-success">Processed {{ success }}</div>{% endif %}
+  <div class="form-grid-4"><div><label>Asset</label><select name="fixed_asset_id" required><option value="">-- Select --</option>{% for a in assets %}<option value="{{ a.id }}">{{ a.asset_code }} - {{ a.asset_name }}</option>{% endfor %}</select></div><div><label>Date</label><input type="date" name="disposal_date" value="{{ default_disposal_date }}"></div><div><label>Proceeds</label><input name="proceeds" value="0"></div><div><label>Disposal Cost</label><input name="disposal_cost" value="0"></div><div style="grid-column: span 4;"><label>Remarks</label><input name="remarks"></div></div><div class="button-row"><button type="submit" name="action" value="save">Save Draft</button><button type="submit" name="action" value="post">Approve & Post</button></div>
+</form>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th>No</th><th>Date</th><th>Proceeds</th><th>Status</th><th>Action</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.disposal_no }}</td><td>{{ row.disposal_date }}</td><td>{{ row.proceeds }}</td><td>{{ row.status }}</td><td>{% if row.status != 'posted' %}<form method="post" action="/asset-disposals/{{ row.id }}/approve"><button type="submit">Approve</button></form>{% endif %}</td></tr>{% else %}<tr><td colspan="5">No disposals found.</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% endblock %}

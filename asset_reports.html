@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Reports - AFYA ERP{% endblock %}
+{% block page_title %}Asset Reports{% endblock %}
+{% block page_subtitle %}Asset Management{% endblock %}
+
+{% block content %}
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Active Assets</div><div class="stat-value">{{ summary.active_count }}</div></div>
+  <div class="stat-card"><div class="stat-label">Disposed Assets</div><div class="stat-value">{{ summary.disposed_count }}</div></div>
+  <div class="stat-card"><div class="stat-label">Total Cost</div><div class="stat-value">{{ summary.total_cost }}</div></div>
+  <div class="stat-card"><div class="stat-label">Accum. Depreciation</div><div class="stat-value">{{ summary.total_accumulated_depreciation }}</div></div>
+  <div class="stat-card"><div class="stat-label">Carrying Amount</div><div class="stat-value">{{ summary.total_carrying_amount }}</div></div>
+</div>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Cost</th><th>Accum. Dep</th><th>Carrying</th><th>Status</th></tr></thead><tbody>{% for row in summary.assets %}<tr><td>{{ row.asset_code }}</td><td>{{ row.asset_name }}</td><td>{{ row.cost }}</td><td>{{ row.accumulated_depreciation }}</td><td>{{ row.carrying_amount }}</td><td>{{ row.status }}</td></tr>{% else %}<tr><td colspan="6">No assets found.</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Academic Setup - AFYA ERP{% endblock %}
+{% block page_title %}Academic Setup{% endblock %}
+{% block page_subtitle %}Programs, academic years, semesters and intakes for college fees control{% endblock %}
+
+{% block content %}
+{% if error_message %}
+<div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+{% if success %}
+<div class="alert alert-success">Academic setup saved successfully.</div>
+{% endif %}
+
+<div class="page-card">
+    <h2 class="section-title">Programs</h2>
+    <form method="post">
+        <input type="hidden" name="action" value="create_program">
+        <div class="form-grid-4">
+            <div>
+                <label>Program Code</label>
+                <input type="text" name="code" placeholder="DIP-NURS">
+            </div>
+            <div>
+                <label>Program Name</label>
+                <input type="text" name="name" placeholder="Diploma in Nursing">
+            </div>
+            <div>
+                <label>Award Type</label>
+                <input type="text" name="award_type" placeholder="Diploma / Certificate">
+            </div>
+            <div>
+                <label>Duration (Semesters)</label>
+                <input type="number" name="duration_in_semesters" min="1" placeholder="6">
+            </div>
+        </div>
+        <div style="margin-top:12px;">
+            <label>Description</label>
+            <textarea name="description" rows="2" placeholder="Optional notes"></textarea>
+        </div>
+        <button type="submit">Save Program</button>
+    </form>
+
+    <div class="table-wrap" style="margin-top:20px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Award</th>
+                    <th>Semesters</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in programs %}
+                <tr>
+                    <td>{{ row.code }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.award_type or '' }}</td>
+                    <td>{{ row.duration_in_semesters or '' }}</td>
+                    <td>{% if row.is_active %}<span class="badge badge-success">Active</span>{% else %}<span class="badge badge-danger">Inactive</span>{% endif %}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5">No programs available.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="page-card">
+    <h2 class="section-title">Academic Years</h2>
+    <form method="post">
+        <input type="hidden" name="action" value="create_academic_year">
+        <div class="form-grid-4">
+            <div>
+                <label>Year Code</label>
+                <input type="text" name="code" placeholder="AY-2026-2027">
+            </div>
+            <div>
+                <label>Year Name</label>
+                <input type="text" name="name" placeholder="2026/2027">
+            </div>
+            <div>
+                <label>Start Date</label>
+                <input type="date" name="start_date">
+            </div>
+            <div>
+                <label>End Date</label>
+                <input type="date" name="end_date">
+            </div>
+        </div>
+        <button type="submit">Save Academic Year</button>
+    </form>
+
+    <div class="table-wrap" style="margin-top:20px;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Period</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in academic_years %}
+                <tr>
+                    <td>{{ row.code }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.start_date }} - {{ row.end_date }}</td>
+                    <td>{{ row.status }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4">No academic years available.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="form-grid-2">
+    <div class="page-card">
+        <h2 class="section-title">Semesters / Terms</h2>
+        <form method="post">
+            <input type="hidden" name="action" value="create_semester">
+            <div>
+                <label>Academic Year</label>
+                <select name="academic_year_id">
+                    <option value="">-- Select --</option>
+                    {% for row in academic_years %}
+                    <option value="{{ row.id }}">{{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-grid-2" style="margin-top:12px;">
+                <div>
+                    <label>Semester Code</label>
+                    <input type="text" name="code" placeholder="SEM1">
+                </div>
+                <div>
+                    <label>Semester Name</label>
+                    <input type="text" name="name" placeholder="Semester I">
+                </div>
+            </div>
+            <div class="form-grid-2" style="margin-top:12px;">
+                <div>
+                    <label>Start Date</label>
+                    <input type="date" name="start_date">
+                </div>
+                <div>
+                    <label>End Date</label>
+                    <input type="date" name="end_date">
+                </div>
+            </div>
+            <button type="submit">Save Semester</button>
+        </form>
+
+        <div class="table-wrap" style="margin-top:20px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Dates</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in semesters %}
+                    <tr>
+                        <td>{{ row.code }}</td>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.start_date }} - {{ row.end_date }}</td>
+                        <td>{{ row.status }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4">No semesters available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="page-card">
+        <h2 class="section-title">Intakes / Batches</h2>
+        <form method="post">
+            <input type="hidden" name="action" value="create_intake">
+            <div>
+                <label>Academic Year</label>
+                <select name="academic_year_id">
+                    <option value="">-- Select --</option>
+                    {% for row in academic_years %}
+                    <option value="{{ row.id }}">{{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-grid-2" style="margin-top:12px;">
+                <div>
+                    <label>Intake Code</label>
+                    <input type="text" name="code" placeholder="INTAKE-JAN26">
+                </div>
+                <div>
+                    <label>Intake Name</label>
+                    <input type="text" name="name" placeholder="January 2026 Intake">
+                </div>
+            </div>
+            <div class="form-grid-2" style="margin-top:12px;">
+                <div>
+                    <label>Start Date</label>
+                    <input type="date" name="start_date">
+                </div>
+                <div>
+                    <label>End Date</label>
+                    <input type="date" name="end_date">
+                </div>
+            </div>
+            <button type="submit">Save Intake</button>
+        </form>
+
+        <div class="table-wrap" style="margin-top:20px;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Dates</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in intakes %}
+                    <tr>
+                        <td>{{ row.code }}</td>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.start_date }} - {{ row.end_date }}</td>
+                        <td>{{ row.status }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4">No intakes available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

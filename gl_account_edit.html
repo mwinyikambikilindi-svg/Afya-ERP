@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Edit GL Account - AFYA ERP{% endblock %}
+{% block page_title %}Edit GL Account{% endblock %}
+{% block page_subtitle %}Update account structure and posting controls{% endblock %}
+
+{% block content %}
+{% if error_message %}
+    <div class="message error">{{ error_message }}</div>
+{% endif %}
+
+<div class="page-card">
+    <h2 class="section-title">GL Account Details</h2>
+
+    <form method="post">
+        <div class="form-grid-2">
+            <div>
+                <label for="account_group_id">Account Group</label>
+                <select name="account_group_id" id="account_group_id" required>
+                    <option value="">-- Select Account Group --</option>
+                    {% for group in account_groups %}
+                        <option value="{{ group.id }}" {% if group.id == account.account_group_id %}selected{% endif %}>
+                            {{ group.code }} - {{ group.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="code">Account Code</label>
+                <input type="text" name="code" id="code" value="{{ account.code }}" required>
+            </div>
+
+            <div>
+                <label for="name">Account Name</label>
+                <input type="text" name="name" id="name" value="{{ account.name }}" required>
+            </div>
+
+            <div>
+                <label for="account_type">Account Type</label>
+                <select name="account_type" id="account_type" required>
+                    <option value="posting" {% if account.account_type == 'posting' %}selected{% endif %}>Posting</option>
+                    <option value="header" {% if account.account_type == 'header' %}selected{% endif %}>Header</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:18px;">
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="allow_manual_posting" id="allow_manual_posting" {% if account.allow_manual_posting %}checked{% endif %} style="width:auto; margin-right:8px;">
+                <label for="allow_manual_posting" style="display:inline; font-weight:normal;">Allow Manual Posting</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="requires_subledger" id="requires_subledger" {% if account.requires_subledger %}checked{% endif %} style="width:auto; margin-right:8px;">
+                <label for="requires_subledger" style="display:inline; font-weight:normal;">Requires Subledger</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="requires_cost_center" id="requires_cost_center" {% if account.requires_cost_center %}checked{% endif %} style="width:auto; margin-right:8px;">
+                <label for="requires_cost_center" style="display:inline; font-weight:normal;">Requires Cost Center</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="requires_department" id="requires_department" {% if account.requires_department %}checked{% endif %} style="width:auto; margin-right:8px;">
+                <label for="requires_department" style="display:inline; font-weight:normal;">Requires Department</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="is_control_account" id="is_control_account" {% if account.is_control_account %}checked{% endif %} style="width:auto; margin-right:8px;">
+                <label for="is_control_account" style="display:inline; font-weight:normal;">Control Account</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="is_active" id="is_active" {% if account.is_active %}checked{% endif %} style="width:auto; margin-right:8px;">
+                <label for="is_active" style="display:inline; font-weight:normal;">Active</label>
+            </div>
+        </div>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

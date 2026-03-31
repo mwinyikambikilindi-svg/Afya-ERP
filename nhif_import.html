@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}NHIF Import - AFYA ERP{% endblock %}
+{% block page_title %}NHIF Import{% endblock %}
+{% block page_subtitle %}Upload NHIF reimbursement / claim receipt PDF for review-first capture{% endblock %}
+{% block content %}
+<div class="page-card">
+  <h2 class="section-title">Upload NHIF PDF</h2>
+  {% if error_message %}<div class="message error">{{ error_message }}</div>{% endif %}
+  <form method="post" enctype="multipart/form-data">
+    <div class="form-grid-2">
+      <div>
+        <label for="pdf_file">NHIF PDF</label>
+        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit">Upload & Extract</button>
+    </div>
+  </form>
+</div>
+
+{% if extracted %}
+<div class="page-card" style="margin-top:16px;">
+  <h2 class="section-title">Extracted Preview</h2>
+  <div class="table-wrap">
+    <table>
+      <tbody>
+        <tr><th>Facility</th><td>{{ extracted.facility_name or '' }}</td></tr>
+        <tr><th>Claim Month</th><td>{{ extracted.claim_month or '' }}</td></tr>
+        <tr><th>NHIF Reference</th><td>{{ extracted.nhif_reference or '' }}</td></tr>
+        <tr><th>Claimed</th><td>TZS {{ "{:,.2f}".format(extracted.amount_claimed) }}</td></tr>
+        <tr><th>Paid</th><td>TZS {{ "{:,.2f}".format(extracted.amount_paid) }}</td></tr>
+        <tr><th>Rejected / Adjustment</th><td>TZS {{ "{:,.2f}".format(extracted.adjustment_total) }}</td></tr>
+        <tr><th>Claim Forms</th><td>{{ extracted.claim_forms_count or '' }}</td></tr>
+        <tr><th>Payment Ref</th><td>{{ extracted.payment_reference or '' }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:16px;">Create Claim from Imported Data</h3>
+  <form method="post" action="/nhif-claims">
+    <input type="hidden" name="import_batch_id" value="{{ import_batch_id or '' }}">
+    <input type="hidden" name="adjustment_total" value="{{ extracted.adjustment_total }}">
+    <div class="form-grid-2">
+      <div><label>Facility</label><input type="text" name="facility_name" value="{{ extracted.facility_name or '' }}" required></div>
+      <div><label>Claim Month</label><input type="text" name="claim_month" value="{{ extracted.claim_month or '' }}" required></div>
+      <div><label>NHIF Reference</label><input type="text" name="nhif_reference" value="{{ extracted.nhif_reference or '' }}"></div>
+      <div><label>Claim Date</label><input type="date" name="claim_date" value="{{ extracted.claim_date or '' }}"></div>
+      <div><label>Amount Claimed</label><input type="text" name="amount_claimed" value="{{ extracted.amount_claimed }}"></div>
+      <div><label>Amount Paid</label><input type="text" name="amount_paid" value="{{ extracted.amount_paid }}"></div>
+      <div><label>Claim Forms Count</label><input type="number" name="claim_forms_count" value="{{ extracted.claim_forms_count or '' }}"></div>
+      <div><label>Payment Reference</label><input type="text" name="payment_reference" value="{{ extracted.payment_reference or '' }}"></div>
+    </div>
+    <div class="form-actions">
+      <button type="submit">Save NHIF Claim</button>
+    </div>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

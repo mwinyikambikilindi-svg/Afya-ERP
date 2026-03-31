@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Payer - AFYA ERP{% endblock %}
+{% block page_title %}Edit Payer{% endblock %}
+{% block page_subtitle %}Update payer details and status{% endblock %}
+
+{% block content %}
+{% if error_message %}
+    <div class="message error">{{ error_message }}</div>
+{% endif %}
+
+<div class="page-card">
+    <h2 class="section-title">Payer Details</h2>
+
+    <form method="post">
+        <div class="form-grid-2">
+            <div>
+                <label for="payer_type_id">Payer Type</label>
+                <select name="payer_type_id" id="payer_type_id" required>
+                    <option value="">-- Select Payer Type --</option>
+                    {% for pt in payer_types %}
+                        <option value="{{ pt.id }}" {% if pt.id == payer.payer_type_id %}selected{% endif %}>
+                            {{ pt.code }} - {{ pt.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="code">Payer Code</label>
+                <input type="text" name="code" id="code" value="{{ payer.code }}" required>
+            </div>
+
+            <div>
+                <label for="name">Payer Name</label>
+                <input type="text" name="name" id="name" value="{{ payer.name }}" required>
+            </div>
+
+            <div>
+                <label for="phone">Phone</label>
+                <input type="text" name="phone" id="phone" value="{{ payer.phone or '' }}">
+            </div>
+
+            <div>
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" value="{{ payer.email or '' }}">
+            </div>
+
+            <div>
+                <label for="contact_person">Contact Person</label>
+                <input type="text" name="contact_person" id="contact_person" value="{{ payer.contact_person or '' }}">
+            </div>
+
+            <div>
+                <label for="tin">TIN</label>
+                <input type="text" name="tin" id="tin" value="{{ payer.tin or '' }}">
+            </div>
+
+            <div>
+                <label for="address">Address</label>
+                <input type="text" name="address" id="address" value="{{ payer.address or '' }}">
+            </div>
+        </div>
+
+        <div style="margin:14px 0;">
+            <input type="checkbox" name="is_active" id="is_active" {% if payer.is_active %}checked{% endif %} style="width:auto; margin-right:8px;">
+            <label for="is_active" style="display:inline; font-weight:normal;">Payer is active</label>
+        </div>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

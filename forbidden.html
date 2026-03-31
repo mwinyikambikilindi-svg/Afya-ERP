@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied - AFYA ERP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+    <div class="login-shell">
+        <div class="login-card">
+            <h1 class="login-title">Access Denied</h1>
+            <p class="login-sub">Huna ruhusa ya kufungua page hii.</p>
+
+            <div class="message error">
+                Role yako ya sasa: <strong>{{ current_role }}</strong><br>
+                Roles zinazoruhusiwa: <strong>{{ allowed_roles | join(', ') }}</strong>
+            </div>
+
+            <a class="btn" href="/" style="display:block; text-align:center; padding:12px; border-radius:12px;">Return to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

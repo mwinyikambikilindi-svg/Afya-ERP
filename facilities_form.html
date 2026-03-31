@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Facility Form - AFYA ERP{% endblock %}
+{% block page_title %}Facility Form{% endblock %}
+{% block page_subtitle %}Add or edit PMU facility{% endblock %}
+{% block content %}
+<div class="page-card">
+  <h2 class="section-title">{% if row %}Edit Facility{% else %}New Facility{% endif %}</h2>
+  {% if error_message %}<div class="message error">{{ error_message }}</div>{% endif %}
+  <form method="post">
+    <div class="form-grid-2">
+      <div><label>Facility Code</label><input type="text" name="facility_code" value="{{ row.facility_code if row else '' }}"></div>
+      <div><label>Facility Name</label><input type="text" name="facility_name" value="{{ row.facility_name if row else '' }}" required></div>
+      <div><label>Facility Type</label><input type="text" name="facility_type" value="{{ row.facility_type if row else '' }}"></div>
+      <div><label>Region</label><input type="text" name="region" value="{{ row.region if row else '' }}"></div>
+      <div><label>District</label><input type="text" name="district" value="{{ row.district if row else '' }}"></div>
+    </div>
+    <div class="form-actions">
+      <button type="submit">Save Facility</button>
+      <a href="/facilities" class="btn-secondary">Back</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

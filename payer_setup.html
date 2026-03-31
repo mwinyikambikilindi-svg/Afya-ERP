@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Payer Setup - AFYA ERP{% endblock %}
+{% block page_title %}Payer Setup{% endblock %}
+{% block page_subtitle %}Create and maintain payer master data{% endblock %}
+
+{% block content %}
+{% if success %}
+    <div class="message success">
+        {% if success == '1' %}
+            Payer saved successfully.
+        {% elif success == 'payer_updated' %}
+            Payer updated successfully.
+        {% elif success == 'status_changed' %}
+            Payer status changed successfully.
+        {% endif %}
+    </div>
+{% endif %}
+
+{% if error_message %}
+    <div class="message error">{{ error_message }}</div>
+{% endif %}
+
+<div class="page-card" style="margin-bottom:20px;">
+    <h2 class="section-title">Create Payer</h2>
+
+    <form method="post">
+        <div class="form-grid">
+            <div>
+                <label for="payer_type_id">Payer Type</label>
+                <select name="payer_type_id" id="payer_type_id" required>
+                    <option value="">-- Select Payer Type --</option>
+                    {% for pt in payer_types %}
+                        <option value="{{ pt.id }}">{{ pt.code }} - {{ pt.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="code">Payer Code</label>
+                <input type="text" name="code" id="code" placeholder="Mfano NHIF-HQ" required>
+            </div>
+
+            <div>
+                <label for="name">Payer Name</label>
+                <input type="text" name="name" id="name" placeholder="Mfano NHIF Main Office" required>
+            </div>
+
+            <div>
+                <label for="phone">Phone</label>
+                <input type="text" name="phone" id="phone">
+            </div>
+
+            <div>
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email">
+            </div>
+
+            <div>
+                <label for="contact_person">Contact Person</label>
+                <input type="text" name="contact_person" id="contact_person">
+            </div>
+
+            <div>
+                <label for="tin">TIN</label>
+                <input type="text" name="tin" id="tin">
+            </div>
+
+            <div style="grid-column: span 2;">
+                <label for="address">Address</label>
+                <input type="text" name="address" id="address">
+            </div>
+        </div>
+
+        <button type="submit">Save Payer</button>
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="page-card" style="box-shadow:none; border:none; padding-bottom:0;">
+        <h2 class="section-title">Existing Payers</h2>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Payer Type</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Contact Person</th>
+                    <th>TIN</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payer in payers %}
+                <tr>
+                    <td>{{ payer.id }}</td>
+                    <td>{{ payer.payer_type_code }} - {{ payer.payer_type_name }}</td>
+                    <td>{{ payer.code }}</td>
+                    <td>{{ payer.name }}</td>
+                    <td>{{ payer.phone or '' }}</td>
+                    <td>{{ payer.email or '' }}</td>
+                    <td>{{ payer.contact_person or '' }}</td>
+                    <td>{{ payer.tin or '' }}</td>
+                    <td>
+                        {% if payer.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/payers/{{ payer.id }}/edit">Edit</a></td>
+                    <td>
+                        <form method="post" action="/payers/{{ payer.id }}/toggle-status" class="inline-form">
+                            {% if payer.is_active %}
+                                <button type="submit" class="btn-small btn-danger">Deactivate</button>
+                            {% else %}
+                                <button type="submit" class="btn-small btn-secondary">Activate</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="11">No payers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

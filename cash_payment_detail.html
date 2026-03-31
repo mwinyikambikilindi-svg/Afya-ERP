@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Cash Payment Detail - AFYA ERP{% endblock %}
+{% block page_title %}Cash Payment Detail{% endblock %}
+{% block page_subtitle %}Review payment header, lines and linked journal{% endblock %}
+
+{% block content %}
+{% if error_message %}
+<div class="page-card" style="border-left:4px solid #c62828; margin-bottom:20px;">
+    <strong>Error:</strong> {{ error_message }}
+</div>
+{% endif %}
+
+<div class="page-card" style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+    <div>
+        <a href="/cash-payments" class="btn btn-secondary">Back to Cash Payments</a>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        {% if session.get('role_name') == 'ADMIN' and payment.status != 'posted' and not journal %}
+        <form method="POST" action="/cash-payments/{{ payment.id }}/approve" style="display:inline;">
+            <button type="submit" class="btn btn-success">Approve &amp; Post</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid-2" style="margin-bottom:20px;">
+    <div class="page-card">
+        <h2 class="section-title">Payment Header</h2>
+        <div><strong>Payment No:</strong> {{ payment.payment_no }}</div>
+        <div><strong>Status:</strong>
+            {% if payment.status == 'posted' %}
+                <span class="badge badge-success">Posted</span>
+            {% elif payment.status == 'draft_pending_review' %}
+                <span class="badge badge-warning">Pending Review</span>
+            {% else %}
+                <span class="badge badge-warning">Draft</span>
+            {% endif %}
+        </div>
+        <div><strong>Payment Date:</strong> {{ payment.payment_date }}</div>
+        <div><strong>Payment Type:</strong> {{ payment.payment_type }}</div>
+        <div><strong>Branch:</strong> {{ payment.branch_code }} - {{ payment.branch_name }}</div>
+        <div><strong>Cash / Bank Account:</strong> {{ payment.cash_account_code }} - {{ payment.cash_account_name }}</div>
+        <div><strong>Supplier:</strong>
+            {% if payment.supplier_name %}
+                {{ payment.supplier_code }} - {{ payment.supplier_name }}
+            {% else %}
+                -
+            {% endif %}
+        </div>
+        <div><strong>Reference No:</strong> {{ payment.reference_no or '' }}</div>
+    </div>
+
+    <div class="page-card">
+        <h2 class="section-title">Summary</h2>
+        <div><strong>Total Amount:</strong> {{ total_amount }}</div>
+        <div style="margin-top:14px;"><strong>Narration:</strong></div>
+        <div class="muted">{{ payment.narration or '' }}</div>
+
+        {% if journal %}
+        <div style="margin-top:18px;">
+            <strong>Posted Journal:</strong><br>
+            <a href="/journals/{{ journal.id }}">Open Journal {{ journal.batch_no }}</a>
+            ({{ journal.status }})
+        </div>
+        {% else %}
+        <div style="margin-top:18px;">
+            <span class="badge badge-warning">No linked journal posted yet</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="page-card" style="box-shadow:none; border:none; padding-bottom:0;">
+        <h2 class="section-title">Payment Lines</h2>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Expense Account Code</th>
+                    <th>Expense Account Name</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in lines %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ line.expense_account_code }}</td>
+                    <td>{{ line.expense_account_name }}</td>
+                    <td>{{ line.description or '' }}</td>
+                    <td>{{ line.amount }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">No payment lines found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

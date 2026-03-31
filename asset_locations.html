@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Locations - AFYA ERP{% endblock %}
+{% block page_title %}Asset Locations{% endblock %}
+{% block page_subtitle %}Asset Management{% endblock %}
+
+{% block content %}
+
+<form method="post" class="page-card">
+  <h2 class="section-title">New Asset Location</h2>{% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}{% if success %}<div class="alert alert-success">Saved successfully.</div>{% endif %}
+  <div class="form-grid-3"><div><label>Code</label><input name="code" required></div><div><label>Name</label><input name="name" required></div><div><label>Description</label><input name="description"></div></div><button type="submit">Save Location</button>
+</form>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Description</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.code }}</td><td>{{ row.name }}</td><td>{{ row.description or '' }}</td></tr>{% else %}<tr><td colspan="3">No locations found.</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Structures - AFYA ERP{% endblock %}
+{% block page_title %}Fee Structures{% endblock %}
+{% block page_subtitle %}Configure charge schedules by program, academic year, semester and intake{% endblock %}
+
+{% block content %}
+{% if error_message %}
+<div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+{% if success %}
+<div class="alert alert-success">Fee structure action completed successfully.</div>
+{% endif %}
+
+<div class="page-card">
+    <h2 class="section-title">Create Fee Structure Header</h2>
+    <form method="post">
+        <input type="hidden" name="action" value="create_structure">
+        <div class="form-grid-4">
+            <div>
+                <label>Structure Code</label>
+                <input type="text" name="code" placeholder="FS-2026-NURS-SEM1">
+            </div>
+            <div>
+                <label>Structure Name</label>
+                <input type="text" name="name" placeholder="Nursing Semester I 2026">
+            </div>
+            <div>
+                <label>Program</label>
+                <select name="program_id">
+                    <option value="">-- Select --</option>
+                    {% for row in programs %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Academic Year</label>
+                <select name="academic_year_id">
+                    <option value="">-- Select --</option>
+                    {% for row in academic_years %}
+                    <option value="{{ row.id }}">{{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-grid-4" style="margin-top:12px;">
+            <div>
+                <label>Semester</label>
+                <select name="semester_id">
+                    <option value="">-- Select --</option>
+                    {% for row in semesters %}
+                    <option value="{{ row.id }}">{{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Intake</label>
+                <select name="intake_id">
+                    <option value="">-- Select --</option>
+                    {% for row in intakes %}
+                    <option value="{{ row.id }}">{{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Currency</label>
+                <input type="text" name="currency_code" value="TZS">
+            </div>
+            <div>
+                <label>Notes</label>
+                <input type="text" name="notes" placeholder="Optional notes">
+            </div>
+        </div>
+
+        <button type="submit">Save Fee Structure</button>
+    </form>
+</div>
+
+<div class="page-card">
+    <h2 class="section-title">Add Fee Item to Structure</h2>
+    <form method="post">
+        <input type="hidden" name="action" value="add_line">
+        <div class="form-grid-4">
+            <div>
+                <label>Fee Structure</label>
+                <select name="fee_structure_id">
+                    <option value="">-- Select --</option>
+                    {% for row in fee_structures %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Fee Item</label>
+                <select name="fee_item_id">
+                    <option value="">-- Select --</option>
+                    {% for row in fee_items %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Amount</label>
+                <input type="number" step="0.01" name="amount" placeholder="0.00">
+            </div>
+            <div>
+                <label>Sort Order</label>
+                <input type="number" name="sort_order" value="1">
+            </div>
+        </div>
+        <div style="margin-top:12px;">
+            <label><input type="checkbox" name="mandatory" checked> Mandatory charge</label>
+        </div>
+        <button type="submit">Add Line</button>
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Structure</th>
+                    <th>Program</th>
+                    <th>Academic Year</th>
+                    <th>Semester</th>
+                    <th>Intake</th>
+                    <th>Status</th>
+                    <th>Total Lines</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in fee_structures %}
+                <tr>
+                    <td>{{ row.code }} - {{ row.name }}</td>
+                    <td>{{ row.program.name if row.program else '' }}</td>
+                    <td>{{ row.academic_year.name if row.academic_year else '' }}</td>
+                    <td>{{ row.semester.name if row.semester else '' }}</td>
+                    <td>{{ row.intake.name if row.intake else '' }}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.lines|length }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No fee structures found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

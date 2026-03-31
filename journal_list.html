@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Journal Register - AFYA ERP{% endblock %}
+{% block page_title %}Journal Register{% endblock %}
+{% block page_subtitle %}View, filter and review all journal batches{% endblock %}
+
+{% block content %}
+<div class="page-card">
+    <h2 class="section-title">Filters</h2>
+
+    <form method="get">
+        <div class="form-grid-2">
+            <div>
+                <label for="status">Status</label>
+                <select name="status" id="status">
+                    <option value="">-- All --</option>
+                    <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>Draft</option>
+                    <option value="posted" {% if selected_status == 'posted' %}selected{% endif %}>Posted</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="source_module">Source Module</label>
+                <input type="text" name="source_module" id="source_module" value="{{ selected_source_module or '' }}" placeholder="Mfano MANUAL_JOURNAL">
+            </div>
+        </div>
+
+        <button type="submit">Apply Filters</button>
+    </form>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Journals</div>
+        <div class="stat-value">{{ total_rows }}</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Batch No</th>
+                    <th>Date</th>
+                    <th>Branch</th>
+                    <th>Source</th>
+                    <th>Reference</th>
+                    <th>Narration</th>
+                    <th>Status</th>
+                    <th>Total Debit</th>
+                    <th>Total Credit</th>
+                    <th>Open</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for journal in journals %}
+                <tr>
+                    <td>{{ journal.id }}</td>
+                    <td>{{ journal.batch_no }}</td>
+                    <td>{{ journal.journal_date }}</td>
+                    <td>{{ journal.branch_code }} - {{ journal.branch_name }}</td>
+                    <td>{{ journal.source_module }}</td>
+                    <td>{{ journal.reference_no or '' }}</td>
+                    <td>{{ journal.narration or '' }}</td>
+                    <td>
+                        {% if journal.status == 'posted' %}
+                            <span class="badge badge-success">Posted</span>
+                        {% else %}
+                            <span class="badge badge-warning">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ journal.total_debit }}</td>
+                    <td>{{ journal.total_credit }}</td>
+                    <td><a href="/journals/{{ journal.id }}">Open</a></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="11">No journals found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

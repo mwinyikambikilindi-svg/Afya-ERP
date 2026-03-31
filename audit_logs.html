@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs - AFYA ERP{% endblock %}
+{% block page_title %}Audit Logs{% endblock %}
+{% block page_subtitle %}Track system access and key user actions{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Audit Records</div>
+        <div class="stat-value">{{ logs|length }}</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date/Time</th>
+                    <th>User</th>
+                    <th>Module</th>
+                    <th>Table</th>
+                    <th>Record ID</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.id }}</td>
+                    <td>{{ log.created_at }}</td>
+                    <td>
+                        {% if log.username %}
+                            {{ log.username }} - {{ log.full_name }}
+                        {% endif %}
+                    </td>
+                    <td>{{ log.module_name }}</td>
+                    <td>{{ log.record_table or '' }}</td>
+                    <td>{{ log.record_id or '' }}</td>
+                    <td>{{ log.action_name }}</td>
+                    <td>{{ log.details or '' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8">No audit logs found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

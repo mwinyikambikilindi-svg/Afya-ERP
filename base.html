@@ -1,0 +1,529 @@
+{% macro icon(name) -%}
+    {% if name == 'dashboard' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M6.5 10.5V20h11V10.5"></path>
+        </svg>
+    {% elif name == 'cash' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+            <circle cx="12" cy="12" r="2.8"></circle>
+        </svg>
+    {% elif name == 'ledger' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 4h10a2 2 0 0 1 2 2v14H8a2 2 0 0 0-2 2Z"></path>
+            <path d="M6 4v16"></path>
+            <path d="M10 8h5"></path>
+            <path d="M10 12h5"></path>
+        </svg>
+    {% elif name == 'reports' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19h16"></path>
+            <path d="M7 16V9"></path>
+            <path d="M12 16V5"></path>
+            <path d="M17 16v-7"></path>
+        </svg>
+    {% elif name == 'admin' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l7 4v5c0 5-3 7.5-7 9-4-1.5-7-4-7-9V7l7-4Z"></path>
+            <path d="M9.5 12 11 13.5 14.5 10"></path>
+        </svg>
+    {% elif name == 'student' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19c1.4-4 4.9-6 8-6 3.1 0 6.6 2 8 6"></path>
+            <circle cx="9" cy="8" r="3"></circle>
+            <path d="M17 8h3"></path>
+            <path d="M18.5 6.5v3"></path>
+        </svg>
+    {% elif name == 'asset' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="5" width="16" height="14" rx="2"></rect>
+            <path d="M8 9h8"></path>
+            <path d="M8 13h5"></path>
+        </svg>
+    {% elif name == 'notify' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7"></path>
+            <path d="M10 20a2 2 0 0 0 4 0"></path>
+        </svg>
+    {% elif name == 'profile' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"></path>
+        </svg>
+    {% elif name == 'search' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+        </svg>
+    {% elif name == 'home' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11.5 12 4l9 7.5"></path>
+            <path d="M6.5 10.5V20h11V10.5"></path>
+        </svg>
+    {% elif name == 'logout' %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"></path>
+            <path d="M10 17l5-5-5-5"></path>
+            <path d="M15 12H4"></path>
+        </svg>
+    {% else %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="5" width="14" height="14" rx="2"></rect>
+        </svg>
+    {% endif %}
+{%- endmacro %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AFYA ERP{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/topbar_live.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% set active_path = request.path %}
+<div class="app-shell">
+    <header class="topbar">
+        <div class="topbar-brand">
+            <div class="topbar-logo-wrap">
+    <img
+        src="{{ url_for('static', filename='img/tz-logo.png') }}"
+        alt="Tanzania Coat of Arms"
+        class="topbar-logo"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';"
+    >
+    <div class="logo-fallback">TZ</div>
+</div>
+
+            <div class="topbar-brand-text">
+                <div class="topbar-brand-line-1">Government of Tanzania</div>
+                <div class="topbar-brand-line-2">Mfumo wa Uhasibu Afya</div>
+                <div class="topbar-brand-line-3">PMU Financial &amp; Operations System</div>
+            </div>
+        </div>
+
+        <div class="topbar-main">
+            <div class="topbar-org">
+                <div class="topbar-org-inner">
+                    <div class="topbar-org-title">00280000 - Ministry of Home Affairs - Police Force</div>
+                    <div class="topbar-org-sub">5001 - Police Medical Unit</div>
+                </div>
+            </div>
+
+            <div class="topbar-search-wrap">
+                <div class="topbar-search" title="Search modules, records and reports">
+                    <span class="topbar-search-icon">{{ icon('search') }}</span>
+                    <input type="text" placeholder="Find menu, report, student, journal or asset" data-menu-search data-global-search-input autocomplete="off">
+                </div>
+                <div class="topbar-search-results" data-global-search-results hidden></div>
+            </div>
+
+            <div class="topbar-right">
+                {% if global_fiscal_years %}
+                <div class="top-chip">
+                    <form method="post" action="{{ url_for('switch_fiscal_year') }}" class="top-chip-inline">
+                        <select name="fiscal_year_id" onchange="this.form.submit()">
+                            {% for fy in global_fiscal_years %}
+                                <option value="{{ fy.id }}" {% if current_fiscal_year and fy.id == current_fiscal_year.id %}selected{% endif %}>F/Y: {{ fy.year_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                {% endif %}
+
+                <div class="topbar-notify">
+                    <button type="button" class="notify-chip" data-notification-toggle aria-label="Open notifications" aria-expanded="false">
+                        <span class="notify-chip__icon">{{ icon('notify') }}</span>
+                        <span class="notify-chip__count" data-notification-badge hidden>0</span>
+                    </button>
+                    <div class="notify-popover" data-notification-popover hidden>
+                        <div class="notify-popover__head">
+                            <span>Notifications</span>
+                            <a href="/notifications-center">View all</a>
+                        </div>
+                        <div class="notify-popover__body" data-notification-list>Loading...</div>
+                    </div>
+                </div>
+
+                <a href="/profile" class="user-chip" title="Open profile">
+                    <span class="user-chip__icon">{{ icon('profile') }}</span>
+                    <span>{{ session.get("full_name") or 'User' }}</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    <div class="topbar-green-line"></div>
+
+    <div class="shell-main">
+        <aside class="sidebar" data-shell-sidebar>
+            <div class="sidebar-user">
+                <div class="user-avatar">
+                    {{ (session.get("full_name") or "U")[0] }}
+                </div>
+                <div class="sidebar-user__meta">
+                    <div class="sidebar-user__name">{{ session.get("full_name") or 'User' }}</div>
+                    <div class="sidebar-user__role">{{ session.get("role_name") or 'USER' }}</div>
+                </div>
+            </div>
+
+            <div class="sidebar-menu" data-sidebar-menu>
+                <div class="nav-divider">
+                    <a class="nav-link {% if active_path == '/' %}active{% endif %}" href="/" data-nav-label="dashboard home">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('dashboard') }}</span>
+                            <span>Dashboard</span>
+                        </span>
+                    </a>
+                </div>
+
+                {% if session.get("role_name") in ["ADMIN", "ACCOUNTANT"] %}
+                <details class="nav-accordion" {% if active_path.startswith('/cash-receipts') or active_path.startswith('/cash-payments') %}open{% endif %}>
+                    <summary class="accordion-summary" data-nav-label="cash management receipts payments">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('cash') }}</span>
+                            <span>Cash Management</span>
+                        </span>
+                        <span class="nav-plus">+</span>
+                    </summary>
+                    <div class="nav-submenu">
+                        <a class="submenu-link {% if active_path == '/cash-receipts' %}active{% endif %}" href="/cash-receipts" data-nav-label="receipt register cash receipts">
+                            <span class="submenu-bullet"></span><span>Receipt Register</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/cash-receipts/new' %}active{% endif %}" href="/cash-receipts/new" data-nav-label="new cash receipt capture">
+                            <span class="submenu-bullet"></span><span>New Cash Receipt</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/cash-payments' %}active{% endif %}" href="/cash-payments" data-nav-label="payment register cash payments">
+                            <span class="submenu-bullet"></span><span>Payment Register</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/cash-payments/new' %}active{% endif %}" href="/cash-payments/new" data-nav-label="new cash payment capture">
+                            <span class="submenu-bullet"></span><span>New Cash Payment</span>
+                        </a>
+                    </div>
+                </details>
+
+                <details class="nav-accordion" {% if active_path.startswith('/journals') or active_path.startswith('/manual-journal') or active_path.startswith('/gl-accounts') %}open{% endif %}>
+                    <summary class="accordion-summary" data-nav-label="general ledger journals chart of accounts">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('ledger') }}</span>
+                            <span>General Ledger</span>
+                        </span>
+                        <span class="nav-plus">+</span>
+                    </summary>
+                    <div class="nav-submenu">
+                        <a class="submenu-link {% if active_path == '/manual-journal' %}active{% endif %}" href="/manual-journal" data-nav-label="manual journal entry">
+                            <span class="submenu-bullet"></span><span>Manual Journal</span>
+                        </a>
+                        <a class="submenu-link {% if active_path.startswith('/journals') %}active{% endif %}" href="/journals" data-nav-label="journal register">
+                            <span class="submenu-bullet"></span><span>Journal Register</span>
+                        </a>
+                        {% if session.get("role_name") == "ADMIN" %}
+                        <a class="submenu-link {% if active_path.startswith('/gl-accounts') %}active{% endif %}" href="/gl-accounts" data-nav-label="chart of accounts gl accounts">
+                            <span class="submenu-bullet"></span><span>Chart of Accounts</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </details>
+
+                <details class="nav-accordion" {% if active_path.startswith('/payers') or active_path.startswith('/suppliers') %}open{% endif %}>
+                    <summary class="accordion-summary" data-nav-label="master data payers suppliers">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('profile') }}</span>
+                            <span>Master Data</span>
+                        </span>
+                        <span class="nav-plus">+</span>
+                    </summary>
+                    <div class="nav-submenu">
+                        <a class="submenu-link {% if active_path.startswith('/payers') %}active{% endif %}" href="/payers" data-nav-label="payers">
+                            <span class="submenu-bullet"></span><span>Payers</span>
+                        </a>
+                        <a class="submenu-link {% if active_path.startswith('/suppliers') %}active{% endif %}" href="/suppliers" data-nav-label="suppliers">
+                            <span class="submenu-bullet"></span><span>Suppliers</span>
+                        </a>
+                    </div>
+                </details>
+                {% endif %}
+
+                {% if session.get("role_name") in ["ADMIN", "ACCOUNTANT", "MANAGER", "AUDITOR"] %}
+                <details class="nav-accordion" {% if active_path.startswith('/trial-balance') or active_path.startswith('/income-statement') or active_path.startswith('/statement-of-financial-position') %}open{% endif %}>
+                    <summary class="accordion-summary" data-nav-label="reports trial balance income statement balance sheet">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('reports') }}</span>
+                            <span>Reports</span>
+                        </span>
+                        <span class="nav-plus">+</span>
+                    </summary>
+                    <div class="nav-submenu">
+                        <a class="submenu-link {% if active_path.startswith('/trial-balance') %}active{% endif %}" href="/trial-balance" data-nav-label="trial balance">
+                            <span class="submenu-bullet"></span><span>Trial Balance</span>
+                        </a>
+                        <a class="submenu-link {% if active_path.startswith('/income-statement') %}active{% endif %}" href="/income-statement" data-nav-label="income statement">
+                            <span class="submenu-bullet"></span><span>Income Statement</span>
+                        </a>
+                        <a class="submenu-link {% if active_path.startswith('/statement-of-financial-position') %}active{% endif %}" href="/statement-of-financial-position" data-nav-label="balance sheet statement of financial position">
+                            <span class="submenu-bullet"></span><span>Balance Sheet</span>
+                        </a>
+                    </div>
+                </details>
+                {% endif %}
+
+                <details class="nav-accordion" {% if active_path.startswith('/academic-setup') or active_path.startswith('/students') or active_path.startswith('/fee-') or active_path.startswith('/student-') %}open{% endif %}>
+                    <summary class="accordion-summary" data-nav-label="college fees students revenue receivables sponsors waivers refunds ecl">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('student') }}</span>
+                            <span>College Fees &amp; Students</span>
+                        </span>
+                        <span class="nav-plus">+</span>
+                    </summary>
+                    <div class="nav-submenu">
+                        <a class="submenu-link {% if active_path.startswith('/academic-setup') %}active{% endif %}" href="/academic-setup" data-nav-label="academic setup programs semesters intakes">
+                            <span class="submenu-bullet"></span><span>Academic Setup</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/students' %}active{% endif %}" href="/students" data-nav-label="students register">
+                            <span class="submenu-bullet"></span><span>Student Register</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/fee-items' %}active{% endif %}" href="/fee-items" data-nav-label="fee items gfs mapping">
+                            <span class="submenu-bullet"></span><span>Fee Items</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/fee-structures' %}active{% endif %}" href="/fee-structures" data-nav-label="fee structures">
+                            <span class="submenu-bullet"></span><span>Fee Structures</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-invoices' %}active{% endif %}" href="/student-invoices" data-nav-label="student invoices">
+                            <span class="submenu-bullet"></span><span>Student Invoices</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-payments' %}active{% endif %}" href="/student-payments" data-nav-label="student payments">
+                            <span class="submenu-bullet"></span><span>Student Payments</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-receivables' %}active{% endif %}" href="/student-receivables" data-nav-label="student receivables debtors aging">
+                            <span class="submenu-bullet"></span><span>Student Receivables</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-revenue-recognition' %}active{% endif %}" href="/student-revenue-recognition" data-nav-label="revenue recognition">
+                            <span class="submenu-bullet"></span><span>Revenue Recognition</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-aging' %}active{% endif %}" href="/student-aging" data-nav-label="student aging">
+                            <span class="submenu-bullet"></span><span>Debtors Aging</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-sponsors' %}active{% endif %}" href="/student-sponsors" data-nav-label="sponsor balances">
+                            <span class="submenu-bullet"></span><span>Sponsor Balances</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-approvals' %}active{% endif %}" href="/student-approvals" data-nav-label="student approvals">
+                            <span class="submenu-bullet"></span><span>Approvals Queue</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-waivers' %}active{% endif %}" href="/student-waivers" data-nav-label="student waivers">
+                            <span class="submenu-bullet"></span><span>Waivers</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-credit-notes' %}active{% endif %}" href="/student-credit-notes" data-nav-label="student credit notes">
+                            <span class="submenu-bullet"></span><span>Credit Notes</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-refunds' %}active{% endif %}" href="/student-refunds" data-nav-label="student refunds">
+                            <span class="submenu-bullet"></span><span>Refunds</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/student-ecl' %}active{% endif %}" href="/student-ecl" data-nav-label="student ecl bad debt">
+                            <span class="submenu-bullet"></span><span>ECL / Bad Debt</span>
+                        </a>
+                    </div>
+                </details>
+
+<details class="nav-accordion" {% if active_path.startswith('/nhif-') %}open{% endif %}>
+    <summary class="accordion-summary" data-nav-label="nhif management claims collections rejections reconciliation dashboard">
+        <span class="nav-left">
+            <span class="nav-icon">{{ icon('reports') }}</span>
+            <span>NHIF Management</span>
+        </span>
+        <span class="nav-plus">+</span>
+    </summary>
+    <div class="nav-submenu">
+        <a class="submenu-link {% if active_path == '/nhif-claims' %}active{% endif %}" href="/nhif-claims" data-nav-label="nhif claims">
+            <span class="submenu-bullet"></span><span>NHIF Claims</span>
+        </a>
+        <a class="submenu-link {% if active_path == '/nhif-collections' %}active{% endif %}" href="/nhif-collections" data-nav-label="nhif collections">
+            <span class="submenu-bullet"></span><span>NHIF Collections</span>
+        </a>
+        <a class="submenu-link {% if active_path == '/nhif-rejections' %}active{% endif %}" href="/nhif-rejections" data-nav-label="nhif rejections losses">
+            <span class="submenu-bullet"></span><span>NHIF Rejections / Losses</span>
+        </a>
+        <a class="submenu-link {% if active_path == '/nhif-reconciliation' %}active{% endif %}" href="/nhif-reconciliation" data-nav-label="nhif reconciliation">
+            <span class="submenu-bullet"></span><span>NHIF Reconciliation</span>
+        </a>
+        <a class="submenu-link {% if active_path == '/nhif-dashboard' %}active{% endif %}" href="/nhif-dashboard" data-nav-label="nhif dashboard facility performance">
+            <span class="submenu-bullet"></span><span>NHIF Dashboard</span>
+        </a>
+    </div>
+</details>
+
+                <details class="nav-accordion" {% if active_path.startswith('/asset-') or active_path.startswith('/fixed-assets') %}open{% endif %}>
+                    <summary class="accordion-summary" data-nav-label="asset management depreciation disposals maintenance">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('asset') }}</span>
+                            <span>Asset Management</span>
+                        </span>
+                        <span class="nav-plus">+</span>
+                    </summary>
+                    <div class="nav-submenu">
+                        <a class="submenu-link {% if active_path == '/asset-categories' %}active{% endif %}" href="/asset-categories" data-nav-label="asset categories">
+                            <span class="submenu-bullet"></span><span>Asset Categories</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/asset-locations' %}active{% endif %}" href="/asset-locations" data-nav-label="asset locations">
+                            <span class="submenu-bullet"></span><span>Asset Locations</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/asset-custodians' %}active{% endif %}" href="/asset-custodians" data-nav-label="asset custodians">
+                            <span class="submenu-bullet"></span><span>Asset Custodians</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/fixed-assets' %}active{% endif %}" href="/fixed-assets" data-nav-label="fixed assets asset register">
+                            <span class="submenu-bullet"></span><span>Asset Register</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/asset-acquisitions' %}active{% endif %}" href="/asset-acquisitions" data-nav-label="asset acquisitions">
+                            <span class="submenu-bullet"></span><span>Asset Acquisitions</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/asset-maintenance' %}active{% endif %}" href="/asset-maintenance" data-nav-label="asset maintenance">
+                            <span class="submenu-bullet"></span><span>Asset Maintenance</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/asset-depreciation' %}active{% endif %}" href="/asset-depreciation" data-nav-label="asset depreciation">
+                            <span class="submenu-bullet"></span><span>Depreciation Runs</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/asset-disposals' %}active{% endif %}" href="/asset-disposals" data-nav-label="asset disposals">
+                            <span class="submenu-bullet"></span><span>Asset Disposals</span>
+                        </a>
+                        <a class="submenu-link {% if active_path == '/asset-reports' %}active{% endif %}" href="/asset-reports" data-nav-label="asset reports">
+                            <span class="submenu-bullet"></span><span>Asset Reports</span>
+                        </a>
+                    </div>
+                </details>
+
+<details class="nav-accordion" {% if active_path.startswith('/reports') or active_path.startswith('/budget') %}open{% endif %}>
+    <summary class="accordion-summary" data-nav-label="reports financial statements trial balance sofp sofperf cash flow equity notes budget control panel official">
+        <span class="nav-left">
+            <span class="nav-icon">{{ icon('reports') }}</span>
+            <span>Financial Reports</span>
+        </span>
+        <span class="nav-plus">+</span>
+    </summary>
+
+    <div class="nav-submenu">
+        <a class="submenu-link {% if active_path == '/reports/control-panel' %}active{% endif %}" href="/reports/control-panel">
+            <span class="submenu-bullet"></span><span>Report Control Panel</span>
+        </a>
+
+        <a class="submenu-link {% if active_path == '/reports/official/trial-balance' %}active{% endif %}" href="/reports/official/trial-balance">
+            <span class="submenu-bullet"></span><span>Trial Balance</span>
+        </a>
+
+        <a class="submenu-link {% if active_path == '/reports/official/statement-of-financial-position' %}active{% endif %}" href="/reports/official/statement-of-financial-position">
+            <span class="submenu-bullet"></span><span>Statement of Financial Position</span>
+        </a>
+
+        <a class="submenu-link {% if active_path == '/reports/official/statement-of-financial-performance' %}active{% endif %}" href="/reports/official/statement-of-financial-performance">
+            <span class="submenu-bullet"></span><span>Statement of Financial Performance</span>
+        </a>
+
+        <a class="submenu-link {% if active_path == '/reports/official/budget-vs-actual' %}active{% endif %}" href="/reports/official/budget-vs-actual">
+            <span class="submenu-bullet"></span><span>Budget vs Actual</span>
+        </a>
+
+        <a class="submenu-link {% if active_path == '/reports/official/notes' %}active{% endif %}" href="/reports/official/notes">
+            <span class="submenu-bullet"></span><span>Notes to FS</span>
+        </a>
+
+        <a class="submenu-link {% if active_path == '/reports/official/statement-of-changes-in-equity' %}active{% endif %}" href="/reports/official/statement-of-changes-in-equity">
+            <span class="submenu-bullet"></span><span>Changes in Equity</span>
+        </a>
+
+        <a class="submenu-link {% if active_path == '/reports/official/cash-flow-statement' %}active{% endif %}" href="/reports/official/cash-flow-statement">
+            <span class="submenu-bullet"></span><span>Cash Flow Statement</span>
+        </a>
+        <a class="submenu-link {% if active_path.startswith('/budget') %}active{% endif %}" href="/budget">
+            <span class="submenu-bullet"></span><span>Budget Setup</span>
+        </a>
+    </div>
+</details>
+
+<details class="nav-accordion" {% if active_path.startswith('/facilities') %}open{% endif %}>
+    <summary class="accordion-summary" data-nav-label="facilities master facility management centers hospitals dispensaries">
+        <span class="nav-left">
+            <span class="nav-icon">{{ icon('reports') }}</span>
+            <span>Facilities Master</span>
+        </span>
+        <span class="nav-plus">+</span>
+    </summary>
+    <div class="nav-submenu">
+        <a class="submenu-link {% if active_path == '/facilities' %}active{% endif %}" href="/facilities" data-nav-label="facilities list">
+            <span class="submenu-bullet"></span><span>All Facilities</span>
+        </a>
+        <a class="submenu-link {% if active_path == '/facilities/new' %}active{% endif %}" href="/facilities/new" data-nav-label="add facility new facility">
+            <span class="submenu-bullet"></span><span>Add Facility</span>
+        </a>
+    </div>
+</details>
+
+                {% if session.get("role_name") == "ADMIN" %}
+                <details class="nav-accordion" {% if active_path.startswith('/users') or active_path.startswith('/audit-logs') or active_path.startswith('/periods') or active_path.startswith('/opening-balances') or active_path.startswith('/year-end-closing') %}open{% endif %}>
+                    <summary class="accordion-summary" data-nav-label="administration users audit logs accounting periods opening balances">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('admin') }}</span>
+                            <span>Administration</span>
+                        </span>
+                        <span class="nav-plus">+</span>
+                    </summary>
+                    <div class="nav-submenu">
+                        <a class="submenu-link {% if active_path.startswith('/users') %}active{% endif %}" href="/users" data-nav-label="user management">
+                            <span class="submenu-bullet"></span><span>User Management</span>
+                        </a>
+                        <a class="submenu-link {% if active_path.startswith('/audit-logs') %}active{% endif %}" href="/audit-logs" data-nav-label="audit logs">
+                            <span class="submenu-bullet"></span><span>Audit Logs</span>
+                        </a>
+                        <a class="submenu-link {% if active_path.startswith('/periods') %}active{% endif %}" href="/periods" data-nav-label="accounting periods">
+                            <span class="submenu-bullet"></span><span>Accounting Periods</span>
+                        </a>
+                        <a class="submenu-link {% if active_path.startswith('/opening-balances') %}active{% endif %}" href="/opening-balances" data-nav-label="opening balances">
+                            <span class="submenu-bullet"></span><span>Opening Balances</span>
+                        </a>
+                        <a class="submenu-link {% if active_path.startswith('/year-end-closing') %}active{% endif %}" href="/year-end-closing" data-nav-label="year end closing">
+                            <span class="submenu-bullet"></span><span>Year-End Closing</span>
+                        </a>
+                    </div>
+                </details>
+                {% endif %}
+
+                <details class="nav-accordion" {% if active_path.startswith('/profile') %}open{% endif %}>
+                    <summary class="accordion-summary" data-nav-label="profile account settings logout">
+                        <span class="nav-left">
+                            <span class="nav-icon">{{ icon('profile') }}</span>
+                            <span>My Profile</span>
+                        </span>
+                        <span class="nav-plus">+</span>
+                    </summary>
+                    <div class="nav-submenu">
+                        <a class="submenu-link {% if active_path.startswith('/profile') %}active{% endif %}" href="/profile" data-nav-label="profile details">
+                            <span class="submenu-bullet"></span><span>Profile Details</span>
+                        </a>
+                        <a class="submenu-link" href="/logout" data-nav-label="logout sign out">
+                            <span class="submenu-bullet"></span><span>Logout</span>
+                        </a>
+                    </div>
+                </details>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="content-scroll">
+                <div class="page">
+                    <div class="breadcrumb">Home / {% block page_title %}AFYA ERP{% endblock %}</div>
+                    <div class="page-header-row">
+                        <div>
+                            <h2>{{ self.page_title() }}</h2>
+                            <p>{% block page_subtitle %}Integrated finance workspace{% endblock %}</p>
+                        </div>
+                        {% block workspace_actions %}{% endblock %}
+                    </div>
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/app_ui.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

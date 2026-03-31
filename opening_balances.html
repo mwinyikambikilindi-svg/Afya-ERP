@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Opening Balances - AFYA ERP{% endblock %}
+{% block page_title %}Opening Balances{% endblock %}
+{% block page_subtitle %}Post opening balances for assets, liabilities and equity{% endblock %}
+
+{% block content %}
+<div class="message warning">
+    Opening balances ziingizwe mara moja tu kwa branch na fiscal year husika, na zitumie Assets, Liabilities, na Equity accounts tu.
+</div>
+
+{% if success %}
+    <div class="message success">
+        Opening balances posted successfully. Journal Batch ID: {{ batch_id }}
+    </div>
+{% endif %}
+
+{% if error_message %}
+    <div class="message error">{{ error_message }}</div>
+{% endif %}
+
+<div class="page-card" style="margin-bottom:20px;">
+    <h2 class="section-title">Opening Balance Entry</h2>
+
+    <form method="post">
+        <div class="form-grid">
+            <div>
+                <label for="fiscal_year_id">Fiscal Year</label>
+                <select name="fiscal_year_id" id="fiscal_year_id" required>
+                    <option value="">-- Select Fiscal Year --</option>
+                    {% for fy in fiscal_years %}
+                        <option value="{{ fy.id }}">{{ fy.year_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="branch_id">Branch</label>
+                <select name="branch_id" id="branch_id" required>
+                    <option value="">-- Select Branch --</option>
+                    {% for branch in branches %}
+                        <option value="{{ branch.id }}">{{ branch.code }} - {{ branch.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="opening_date">Opening Date</label>
+                <input type="date" name="opening_date" id="opening_date" required>
+            </div>
+
+            <div style="grid-column: span 3;">
+                <label for="remarks">Remarks</label>
+                <textarea name="remarks" id="remarks" placeholder="Mfano Opening balances for FY 2025/2026"></textarea>
+            </div>
+        </div>
+
+        <div class="table-card" style="margin-top:18px;">
+            <div class="page-card" style="box-shadow:none; border:none; padding-bottom:0;">
+                <h2 class="section-title">Opening Balance Lines</h2>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 36%;">GL Account</th>
+                            <th style="width: 28%;">Description</th>
+                            <th style="width: 14%;">Debit</th>
+                            <th style="width: 14%;">Credit</th>
+                            <th style="width: 8%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ob-lines">
+                        {% for i in range(4) %}
+                        <tr>
+                            <td>
+                                <select name="gl_account_id[]">
+                                    <option value="">-- Select Account --</option>
+                                    {% for account in accounts %}
+                                        <option value="{{ account.id }}">
+                                            {{ account.code }} - {{ account.name }} ({{ account.class_name }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td><input type="text" name="description[]" placeholder="Line description"></td>
+                            <td><input type="number" step="0.01" min="0" name="debit_amount[]" placeholder="0.00"></td>
+                            <td><input type="number" step="0.01" min="0" name="credit_amount[]" placeholder="0.00"></td>
+                            <td><button type="button" class="btn-danger btn-small" onclick="removeRow(this)">Remove</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;">
+            <button type="button" class="btn-light btn-small" onclick="addRow()">Add Line</button>
+            <button type="submit" class="btn-small">Post Opening Balances</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="page-card" style="box-shadow:none; border:none; padding-bottom:0;">
+        <h2 class="section-title">Opening Balance History</h2>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fiscal Year</th>
+                    <th>Branch</th>
+                    <th>Opening Date</th>
+                    <th>Status</th>
+                    <th>Journal</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in history %}
+                <tr>
+                    <td>{{ row.id }}</td>
+                    <td>{{ row.year_name }}</td>
+                    <td>{{ row.branch_code }} - {{ row.branch_name }}</td>
+                    <td>{{ row.opening_date }}</td>
+                    <td>
+                        <span class="badge badge-success">{{ row.status }}</span>
+                    </td>
+                    <td><a href="/journals/{{ row.journal_id }}">{{ row.batch_no }}</a></td>
+                    <td>{{ row.remarks or '' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No opening balances posted yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const accountOptions = `
+        <option value="">-- Select Account --</option>
+        {% for account in accounts %}
+            <option value="{{ account.id }}">{{ account.code }} - {{ account.name }} ({{ account.class_name }})</option>
+        {% endfor %}
+    `;
+
+    function addRow() {
+        const tbody = document.getElementById("ob-lines");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>
+                <select name="gl_account_id[]">
+                    ${accountOptions}
+                </select>
+            </td>
+            <td><input type="text" name="description[]" placeholder="Line description"></td>
+            <td><input type="number" step="0.01" min="0" name="debit_amount[]" placeholder="0.00"></td>
+            <td><input type="number" step="0.01" min="0" name="credit_amount[]" placeholder="0.00"></td>
+            <td><button type="button" class="btn-danger btn-small" onclick="removeRow(this)">Remove</button></td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    function removeRow(button) {
+        const tbody = document.getElementById("ob-lines");
+        if (tbody.rows.length <= 2) {
+            alert("Opening balance lazima ibaki na angalau lines mbili.");
+            return;
+        }
+        button.closest("tr").remove();
+    }
+</script>
+{% endblock %}

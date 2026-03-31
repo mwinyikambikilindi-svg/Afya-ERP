@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Items - AFYA ERP{% endblock %}
+{% block page_title %}Fee Item & GFS/GL Mapping{% endblock %}
+{% block page_subtitle %}Configure tuition and college fee items with IPSAS recognition rules{% endblock %}
+
+{% block content %}
+{% if error_message %}
+<div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+{% if success %}
+<div class="alert alert-success">Fee item saved successfully.</div>
+{% endif %}
+
+<div class="page-card">
+    <h2 class="section-title">New Fee Item</h2>
+    <form method="post">
+        <div class="form-grid-4">
+            <div>
+                <label>Fee Item Code</label>
+                <input type="text" name="code" placeholder="TUITION-SEM">
+            </div>
+            <div>
+                <label>Fee Item Name</label>
+                <input type="text" name="name" placeholder="Tuition Fee">
+            </div>
+            <div>
+                <label>Category</label>
+                <select name="category">
+                    <option value="TUITION">Tuition</option>
+                    <option value="REGISTRATION">Registration</option>
+                    <option value="EXAM">Examination</option>
+                    <option value="HOSTEL">Hostel</option>
+                    <option value="OTHER">Other</option>
+                </select>
+            </div>
+            <div>
+                <label>Refundable?</label>
+                <select name="is_refundable">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-grid-3" style="margin-top:12px;">
+            <div>
+                <label>Monetary Class</label>
+                <select name="monetary_class">
+                    <option value="monetary">Monetary</option>
+                    <option value="non_monetary">Non-Monetary</option>
+                    <option value="hybrid">Hybrid</option>
+                </select>
+            </div>
+            <div>
+                <label>Recognition Basis</label>
+                <select name="recognition_basis">
+                    <option value="over_time">Over Time</option>
+                    <option value="on_invoice">On Invoice</option>
+                    <option value="on_census_date">On Census Date</option>
+                </select>
+            </div>
+            <div>
+                <label>Description</label>
+                <input type="text" name="description" placeholder="Optional notes">
+            </div>
+        </div>
+
+        <h3 class="section-title" style="margin-top:20px;">GFS / GL Mapping</h3>
+        <div class="form-grid-3">
+            <div>
+                <label>Receivable Account</label>
+                <select name="gl_receivable_account_id">
+                    <option value="">-- Select --</option>
+                    {% for row in gl_accounts %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Deferred Revenue Account</label>
+                <select name="gl_deferred_revenue_account_id">
+                    <option value="">-- Select --</option>
+                    {% for row in gl_accounts %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Revenue Account</label>
+                <select name="gl_revenue_account_id">
+                    <option value="">-- Select --</option>
+                    {% for row in gl_accounts %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-grid-3" style="margin-top:12px;">
+            <div>
+                <label>Discount / Waiver Account</label>
+                <select name="gl_discount_account_id">
+                    <option value="">-- Select --</option>
+                    {% for row in gl_accounts %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Refund Account</label>
+                <select name="gl_refund_account_id">
+                    <option value="">-- Select --</option>
+                    {% for row in gl_accounts %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>ECL / Impairment Account</label>
+                <select name="gl_ecl_account_id">
+                    <option value="">-- Select --</option>
+                    {% for row in gl_accounts %}
+                    <option value="{{ row.id }}">{{ row.code }} - {{ row.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <button type="submit">Save Fee Item</button>
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Monetary Class</th>
+                    <th>Recognition</th>
+                    <th>Refundable</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in fee_items %}
+                <tr>
+                    <td>{{ row.code }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.category }}</td>
+                    <td>{{ row.monetary_class }}</td>
+                    <td>{{ row.recognition_basis }}</td>
+                    <td>{{ 'Yes' if row.is_refundable else 'No' }}</td>
+                    <td>{% if row.is_active %}<span class="badge badge-success">Active</span>{% else %}<span class="badge badge-danger">Inactive</span>{% endif %}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No fee items found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

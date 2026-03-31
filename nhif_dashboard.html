@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}NHIF Dashboard - AFYA ERP{% endblock %}
+{% block page_title %}NHIF Dashboard{% endblock %}
+{% block page_subtitle %}Claims, collections, rejections, facility performance and reason analysis{% endblock %}
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Total Claimed</div><div class="stat-value">TZS {{ "{:,.2f}".format(result.summary.total_claimed or 0) }}</div></div>
+  <div class="stat-card"><div class="stat-label">Total Collected</div><div class="stat-value">TZS {{ "{:,.2f}".format(result.summary.total_collected or 0) }}</div></div>
+  <div class="stat-card"><div class="stat-label">Total Rejected</div><div class="stat-value">TZS {{ "{:,.2f}".format(result.summary.total_rejected or 0) }}</div></div>
+  <div class="stat-card"><div class="stat-label">Total Claims</div><div class="stat-value">{{ result.summary.total_claims or 0 }}</div></div>
+</div>
+
+<div class="table-card" style="margin-top:16px;">
+  <h2 class="section-title">Facility Performance</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Facility</th><th>Claimed</th><th>Collected</th><th>Rejected</th><th>Outstanding</th><th>Efficiency %</th><th>Rejection %</th></tr>
+      </thead>
+      <tbody>
+        {% for row in result.facility_rows %}
+        <tr>
+          <td>{{ row.facility_name }}</td>
+          <td>TZS {{ "{:,.2f}".format(row.total_claimed or 0) }}</td>
+          <td>TZS {{ "{:,.2f}".format(row.total_collected or 0) }}</td>
+          <td>TZS {{ "{:,.2f}".format(row.total_rejected or 0) }}</td>
+          <td>TZS {{ "{:,.2f}".format(row.total_outstanding or 0) }}</td>
+          <td>{{ "{:,.1f}".format(row.collection_efficiency_pct or 0) }}%</td>
+          <td>{{ "{:,.1f}".format(row.rejection_rate_pct or 0) }}%</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No NHIF facility performance rows found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="table-card" style="margin-top:16px;">
+  <h2 class="section-title">Top Rejection / Loss Reasons</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Reason</th><th>Items</th><th>Total Amount</th></tr></thead>
+      <tbody>
+        {% for row in result.reason_rows %}
+        <tr>
+          <td>{{ row.rejection_reason }}</td>
+          <td>{{ row.item_count }}</td>
+          <td>TZS {{ "{:,.2f}".format(row.total_amount or 0) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3">No rejection reasons captured yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

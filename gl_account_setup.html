@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}GL Account Setup - AFYA ERP{% endblock %}
+{% block page_title %}GL Account Setup{% endblock %}
+{% block page_subtitle %}Maintain chart of accounts and posting controls{% endblock %}
+
+{% block content %}
+{% if success %}
+    <div class="message success">
+        {% if success == '1' %}
+            GL account saved successfully.
+        {% elif success == 'account_updated' %}
+            GL account updated successfully.
+        {% elif success == 'status_changed' %}
+            GL account status changed successfully.
+        {% endif %}
+    </div>
+{% endif %}
+
+{% if error_message %}
+    <div class="message error">{{ error_message }}</div>
+{% endif %}
+
+<div class="page-card" style="margin-bottom:20px;">
+    <h2 class="section-title">Create GL Account</h2>
+
+    <form method="post">
+        <div class="form-grid">
+            <div>
+                <label for="account_group_id">Account Group</label>
+                <select name="account_group_id" id="account_group_id" required>
+                    <option value="">-- Select Account Group --</option>
+                    {% for group in account_groups %}
+                        <option value="{{ group.id }}">{{ group.code }} - {{ group.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="code">Account Code</label>
+                <input type="text" name="code" id="code" placeholder="Mfano 1140" required>
+            </div>
+
+            <div>
+                <label for="name">Account Name</label>
+                <input type="text" name="name" id="name" placeholder="Mfano CRDB Bank Account" required>
+            </div>
+
+            <div>
+                <label for="account_type">Account Type</label>
+                <select name="account_type" id="account_type" required>
+                    <option value="posting">Posting</option>
+                    <option value="header">Header</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:18px;">
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="allow_manual_posting" id="allow_manual_posting" checked style="width:auto; margin-right:8px;">
+                <label for="allow_manual_posting" style="display:inline; font-weight:normal;">Allow Manual Posting</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="requires_subledger" id="requires_subledger" style="width:auto; margin-right:8px;">
+                <label for="requires_subledger" style="display:inline; font-weight:normal;">Requires Subledger</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="requires_cost_center" id="requires_cost_center" style="width:auto; margin-right:8px;">
+                <label for="requires_cost_center" style="display:inline; font-weight:normal;">Requires Cost Center</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="requires_department" id="requires_department" style="width:auto; margin-right:8px;">
+                <label for="requires_department" style="display:inline; font-weight:normal;">Requires Department</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="is_control_account" id="is_control_account" style="width:auto; margin-right:8px;">
+                <label for="is_control_account" style="display:inline; font-weight:normal;">Control Account</label>
+            </div>
+
+            <div class="page-card" style="box-shadow:none;">
+                <input type="checkbox" name="is_active" id="is_active" checked style="width:auto; margin-right:8px;">
+                <label for="is_active" style="display:inline; font-weight:normal;">Active</label>
+            </div>
+        </div>
+
+        <button type="submit">Save GL Account</button>
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="page-card" style="box-shadow:none; border:none; padding-bottom:0;">
+        <h2 class="section-title">Existing GL Accounts</h2>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Class</th>
+                    <th>Group</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Manual</th>
+                    <th>Subledger</th>
+                    <th>Cost Center</th>
+                    <th>Department</th>
+                    <th>Control</th>
+                    <th>Active</th>
+                    <th>Edit</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr>
+                    <td>{{ account.id }}</td>
+                    <td>{{ account.class_code }} - {{ account.class_name }}</td>
+                    <td>{{ account.group_code }} - {{ account.group_name }}</td>
+                    <td>{{ account.code }}</td>
+                    <td>{{ account.name }}</td>
+                    <td>{{ account.account_type }}</td>
+                    <td>{{ "Yes" if account.allow_manual_posting else "No" }}</td>
+                    <td>{{ "Yes" if account.requires_subledger else "No" }}</td>
+                    <td>{{ "Yes" if account.requires_cost_center else "No" }}</td>
+                    <td>{{ "Yes" if account.requires_department else "No" }}</td>
+                    <td>{{ "Yes" if account.is_control_account else "No" }}</td>
+                    <td>
+                        {% if account.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="/gl-accounts/{{ account.id }}/edit">Edit</a></td>
+                    <td>
+                        <form method="post" action="/gl-accounts/{{ account.id }}/toggle-status" class="inline-form">
+                            {% if account.is_active %}
+                                <button type="submit" class="btn-small btn-danger">Deactivate</button>
+                            {% else %}
+                                <button type="submit" class="btn-small btn-secondary">Activate</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="14">No GL accounts found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

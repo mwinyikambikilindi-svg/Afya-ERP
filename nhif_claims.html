@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}NHIF Claims - AFYA ERP{% endblock %}
+{% block page_title %}NHIF Claims{% endblock %}
+{% block page_subtitle %}Capture, approve and review NHIF claims{% endblock %}
+{% block content %}
+<div class="page-card">
+  <div class="section-head">
+    <h2 class="section-title">New NHIF Claim</h2>
+    <a href="/nhif-import" class="btn-secondary">Import PDF</a>
+  </div>
+  {% if error_message %}<div class="message error">{{ error_message }}</div>{% endif %}
+  <form method="post">
+    <div class="form-grid-3">
+      <div><label>Facility</label><input type="text" name="facility_name" required></div>
+      <div><label>Claim Month</label><input type="text" name="claim_month" placeholder="December 2025" required></div>
+      <div><label>NHIF Reference</label><input type="text" name="nhif_reference"></div>
+      <div><label>Claim Date</label><input type="date" name="claim_date" value="{{ today }}"></div>
+      <div><label>Amount Claimed</label><input type="text" name="amount_claimed" required></div>
+      <div><label>Amount Paid</label><input type="text" name="amount_paid"></div>
+      <div><label>Claim Forms Count</label><input type="number" name="claim_forms_count"></div>
+      <div><label>Payment Reference</label><input type="text" name="payment_reference"></div>
+    </div>
+    <div class="form-actions"><button type="submit">Save Claim</button></div>
+  </form>
+</div>
+
+<div class="table-card" style="margin-top:16px;">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Facility</th><th>Month</th><th>Reference</th><th>Claimed</th><th>Paid</th><th>Status</th><th>Adjudication</th><th>PDF</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row.id }}</td>
+          <td>{{ row.facility_name }}</td>
+          <td>{{ row.claim_month }}</td>
+          <td>{{ row.nhif_reference or '' }}</td>
+          <td>TZS {{ "{:,.2f}".format(row.amount_claimed or 0) }}</td>
+          <td>TZS {{ "{:,.2f}".format(row.amount_paid or 0) }}</td>
+          <td>{{ row.status }}</td>
+          <td>{{ row.adjudication_status }}</td>
+          <td>{% if row.source_filename %}<a href="/nhif-pdf/{{ row.source_filename }}" target="_blank">View PDF</a>{% else %}-{% endif %}</td>
+          <td>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <form method="post" action="/nhif-claims/{{ row.id }}/approve" style="display:inline;">
+                <button type="submit">Approve</button>
+              </form>
+              <form method="post" action="/nhif-claims/{{ row.id }}/reject" style="display:inline;">
+                <button type="submit" class="btn-secondary">Reject</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10">No NHIF claims found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

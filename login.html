@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AFYA ERP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body
+    class="login-page"
+    style="--login-hero-url: url('{{ url_for('static', filename='img/login-hero.jpg') }}');"
+>
+    <div class="login-card-slim">
+        <div class="login-topband">
+            <div class="login-emblem">
+                <img
+                    src="{{ url_for('static', filename='img/tz-logo.png') }}"
+                    alt="Tanzania Coat of Arms"
+                    onerror="this.style.display='none'; document.getElementById('login-logo-fallback').style.display='grid';"
+                >
+                <div id="login-logo-fallback" class="login-emblem-fallback">TZ</div>
+            </div>
+
+            <h1 class="login-title">MFUMO WA UHASIBU AFYA</h1>
+            <div class="login-subtitle">Sub-Vote 5001 - Police Medical Unit</div>
+        </div>
+
+        <div class="login-body">
+            <div class="login-note">Tafadhali ingiza taarifa zako kuingia.</div>
+
+            {% if error_message %}
+            <div class="message error">{{ error_message }}</div>
+            {% endif %}
+
+            <form method="post">
+                <label for="username">Jina la Mtumiaji (Username)</label>
+                <input type="text" name="username" id="username" required>
+
+                <label for="password" style="margin-top:14px;">Nenosiri (Password)</label>
+                <input type="password" name="password" id="password" required>
+
+                <div class="login-actions">
+                    <button type="submit" class="login-btn">
+                        INGIA KWENYE MFUMO
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="login-footer">© 2026 PMU-FRAS | V1.0.0</div>
+    </div>
+</body>
+</html>

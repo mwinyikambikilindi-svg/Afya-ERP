@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}New Cash Payment - AFYA ERP{% endblock %}
+{% block page_title %}Cash Payment Entry{% endblock %}
+{% block page_subtitle %}Payment capture through compact popup window{% endblock %}
+{% block workspace_actions %}
+<a href="/cash-payments" class="btn btn-secondary">Payment Register</a>
+<button type="button" data-modal-target="#cashPaymentModal">Open Payment Window</button>
+{% endblock %}
+{% block content %}
+<div class="workspace-window">
+    <div class="window-toolbar">
+        <div>
+            <h2 class="window-title">Payment Workspace</h2>
+            <div class="window-subtitle">Keep the register visible while the payment form opens as a compact mini-window.</div>
+        </div>
+    </div>
+    {% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}
+    {% if success_payment_no %}<div class="alert alert-success">Cash payment <strong>{{ success_payment_no }}</strong> processed successfully.</div>{% endif %}
+
+    <div class="grid-2">
+        <div class="table-card">
+            <h3 class="window-title">Workflow</h3>
+            <div class="info-list">
+                <div class="info-row"><div class="info-label">Save Draft</div><div>Stores payment only.</div></div>
+                <div class="info-row"><div class="info-label">Approve &amp; Post</div><div>Admin posts immediately. Others send for review.</div></div>
+            </div>
+        </div>
+        <div class="table-card">
+            <h3 class="window-title">Actions</h3>
+            <div class="info-list">
+                <div class="info-row"><div class="info-label">New Payment</div><div><button type="button" data-modal-target="#cashPaymentModal">Launch Window</button></div></div>
+                <div class="info-row"><div class="info-label">Register</div><div><a href="/cash-payments">Open register</a></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="enterprise-modal is-open" id="cashPaymentModal" data-auto-open="true">
+  <div class="modal-window modal-window--wide">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title">Cash Payment Window</h3>
+        <div class="modal-subtitle">Compact enterprise data-entry window</div>
+      </div>
+      <button type="button" class="modal-close btn btn-secondary" data-modal-close>×</button>
+    </div>
+    <div class="modal-body">
+      <form method="post" id="cashPaymentForm">
+        <div class="form-grid-4">
+          <div><label for="branch_id">Branch</label><select name="branch_id" id="branch_id" required><option value="">-- Select --</option>{% for branch in branches %}<option value="{{ branch.id }}">{{ branch.code }} - {{ branch.name }}</option>{% endfor %}</select></div>
+          <div><label for="payment_date">Payment Date</label><input type="date" name="payment_date" id="payment_date" value="{{ default_payment_date }}" required></div>
+          <div><label for="payment_type">Payment Type</label><select name="payment_type" id="payment_type" required><option value="">-- Select --</option><option value="CASH">Cash</option><option value="BANK">Bank</option><option value="TRANSFER">Transfer</option></select></div>
+          <div><label for="cash_account_id">Cash / Bank Account</label><select name="cash_account_id" id="cash_account_id" required><option value="">-- Select --</option>{% for account in cash_accounts %}<option value="{{ account.id }}">{{ account.code }} - {{ account.name }}</option>{% endfor %}</select></div>
+          <div><label for="supplier_id">Supplier</label><select name="supplier_id" id="supplier_id"><option value="">-- Optional --</option>{% for supplier in suppliers %}<option value="{{ supplier.id }}">{{ supplier.code }} - {{ supplier.name }}</option>{% endfor %}</select></div>
+          <div><label for="reference_no">Reference No</label><input type="text" name="reference_no" id="reference_no" placeholder="Voucher / cheque ref"></div>
+          <div style="grid-column: span 2;"><label for="narration">Narration</label><input type="text" name="narration" id="narration" placeholder="Short payment narration"></div>
+        </div>
+
+        <div class="table-card" style="margin-top:10px;">
+          <div class="window-toolbar">
+            <h3 class="window-title">Payment Lines</h3>
+            <button type="button" class="btn btn-secondary" onclick="addPaymentRow()">+ Add Line</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th style="width:35%;">Expense Account</th><th>Description</th><th style="width:14%;">Amount</th><th style="width:7%;">Remove</th></tr></thead>
+              <tbody id="paymentLinesBody">
+                <tr>
+                  <td><select name="expense_account_id[]" required><option value="">-- Select account --</option>{% for account in expense_accounts %}<option value="{{ account.id }}">{{ account.code }} - {{ account.name }}</option>{% endfor %}</select></td>
+                  <td><input type="text" name="description[]" placeholder="Line description"></td>
+                  <td><input type="number" step="0.01" min="0" name="amount[]" value="0.00" oninput="calculatePaymentTotal()"></td>
+                  <td><button type="button" class="btn btn-secondary" onclick="removePaymentRow(this)">X</button></td>
+                </tr>
+              </tbody>
+              <tfoot><tr><th colspan="2" style="text-align:right;">Total</th><th id="paymentTotal">0.00</th><th></th></tr></tfoot>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" name="action" value="save" class="btn btn-secondary">Save Draft</button>
+          <button type="submit" name="action" value="post">Approve &amp; Post</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+function addPaymentRow() {
+  const tbody = document.getElementById('paymentLinesBody');
+  const firstRow = tbody.querySelector('tr');
+  const newRow = firstRow.cloneNode(true);
+  newRow.querySelectorAll('input').forEach((input) => { input.value = input.name === 'amount[]' ? '0.00' : ''; });
+  newRow.querySelectorAll('select').forEach((select) => { select.selectedIndex = 0; });
+  tbody.appendChild(newRow); calculatePaymentTotal();
+}
+function removePaymentRow(button) { const tbody = document.getElementById('paymentLinesBody'); if (tbody.querySelectorAll('tr').length <= 1) return; button.closest('tr').remove(); calculatePaymentTotal(); }
+function calculatePaymentTotal() { let total = 0; document.querySelectorAll('input[name="amount[]"]').forEach((input) => { total += parseFloat(input.value || 0); }); document.getElementById('paymentTotal').innerText = total.toFixed(2); }
+calculatePaymentTotal();
+</script>
+{% endblock %}

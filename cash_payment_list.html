@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Cash Payment Register - AFYA ERP{% endblock %}
+{% block page_title %}Cash Payment Register{% endblock %}
+{% block page_subtitle %}Review captured payments and their posting status{% endblock %}
+
+{% block content %}
+<div class="page-card">
+    <h2 class="section-title">Filters</h2>
+
+    <form method="get">
+        <div class="form-grid-2">
+            <div>
+                <label for="status">Status</label>
+                <select name="status" id="status">
+                    <option value="">-- All --</option>
+                    <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>Draft</option>
+                    <option value="posted" {% if selected_status == 'posted' %}selected{% endif %}>Posted</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="payment_type">Payment Type</label>
+                <select name="payment_type" id="payment_type">
+                    <option value="">-- All --</option>
+                    <option value="CASH" {% if selected_payment_type == 'CASH' %}selected{% endif %}>Cash</option>
+                    <option value="BANK" {% if selected_payment_type == 'BANK' %}selected{% endif %}>Bank</option>
+                    <option value="TRANSFER" {% if selected_payment_type == 'TRANSFER' %}selected{% endif %}>Transfer</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit">Apply Filters</button>
+    </form>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Payments</div>
+        <div class="stat-value">{{ total_rows }}</div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Payment No</th>
+                    <th>Date</th>
+                    <th>Branch</th>
+                    <th>Type</th>
+                    <th>Supplier</th>
+                    <th>Cash/Bank Account</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th>Total Amount</th>
+                    <th>Open</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.id }}</td>
+                    <td>{{ payment.payment_no }}</td>
+                    <td>{{ payment.payment_date }}</td>
+                    <td>{{ payment.branch_code }} - {{ payment.branch_name }}</td>
+                    <td>{{ payment.payment_type }}</td>
+                    <td>
+                        {% if payment.supplier_name %}
+                            {{ payment.supplier_code }} - {{ payment.supplier_name }}
+                        {% endif %}
+                    </td>
+                    <td>{{ payment.cash_account_code }} - {{ payment.cash_account_name }}</td>
+                    <td>{{ payment.reference_no or '' }}</td>
+                    <td>
+                        {% if payment.status == 'posted' %}
+                            <span class="badge badge-success">Posted</span>
+                        {% else %}
+                            <span class="badge badge-warning">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ payment.total_amount }}</td>
+                    <td><a href="/cash-payments/{{ payment.id }}">Open</a></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="11">No cash payments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

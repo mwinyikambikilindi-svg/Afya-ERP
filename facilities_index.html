@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Facilities - AFYA ERP{% endblock %}
+{% block page_title %}Facilities Master{% endblock %}
+{% block page_subtitle %}Manage PMU facilities and seed the official 38-facility master list{% endblock %}
+{% block content %}
+<div class="page-card">
+  <div class="section-head">
+    <h2 class="section-title">Facilities</h2>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <a href="/facilities/new" class="btn-secondary">Add Facility</a>
+      <form method="post" action="/facilities/seed-pmu-38" style="display:inline;">
+        <button type="submit">Seed PMU 38</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="table-card" style="margin-top:16px;">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Code</th><th>Name</th><th>Type</th><th>Region</th><th>District</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row.id }}</td>
+          <td>{{ row.facility_code or '' }}</td>
+          <td>{{ row.facility_name }}</td>
+          <td>{{ row.facility_type or '' }}</td>
+          <td>{{ row.region or '' }}</td>
+          <td>{{ row.district or '' }}</td>
+          <td>{% if row.is_active %}Active{% else %}Inactive{% endif %}</td>
+          <td>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <a href="/facilities/{{ row.id }}/edit">Edit</a>
+              <form method="post" action="/facilities/{{ row.id }}/delete" style="display:inline;" onsubmit="return confirm('Delete this facility?');">
+                <button type="submit" class="btn-secondary">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8">No facilities found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

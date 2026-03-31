@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Report Control Panel - AFYA ERP{% endblock %}
+{% block page_title %}Report Control Panel{% endblock %}
+{% block page_subtitle %}Police Medical Unit financial reporting suite{% endblock %}
+{% block content %}
+<div class="page-card">
+    <div style="text-align:center; margin-bottom:14px;">
+        <div style="font-weight:700; text-transform:uppercase; font-size:16px;">Police Medical Unit</div>
+        <div style="font-weight:700; text-transform:uppercase; font-size:13px;">Tanzania Police Force</div>
+        <div style="margin-top:8px; font-weight:700; text-transform:uppercase; font-size:15px;">Financial Reports Control Panel</div>
+    </div>
+
+    <form method="get">
+        <div class="form-grid-2">
+            <div>
+                <label>Fiscal Year</label>
+                <select name="fiscal_year_id" onchange="this.form.submit()">
+                    <option value="">Select</option>
+                    {% for fy in fiscal_years %}
+                    <option value="{{ fy.id }}" {% if selected_fiscal_year_id == fy.id %}selected{% endif %}>{{ fy.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Budget Version</label>
+                <select id="budget_header_id">
+                    <option value="">Approved / Latest for Fiscal Year</option>
+                    {% for b in budget_headers %}
+                    <option value="{{ b.id }}" {% if selected_budget_header_id == b.id %}selected{% endif %}>{{ b.budget_name }} - {{ b.status }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="table-card" style="margin-top:16px;">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Report</th>
+                    <th>Description</th>
+                    <th>Open</th>
+                    <th>Print</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Trial Balance</td>
+                    <td>Detailed GL balances by account</td>
+                    <td><a href="/reports/official/trial-balance{% if selected_fiscal_year_id %}?fiscal_year_id={{ selected_fiscal_year_id }}{% endif %}">Open Official</a></td>
+                    <td><a href="/reports/official/trial-balance/print{% if selected_fiscal_year_id %}?fiscal_year_id={{ selected_fiscal_year_id }}{% endif %}" target="_blank">Print Official</a></td>
+                </tr>
+                <tr>
+                    <td>Statement of Financial Position</td>
+                    <td>Assets, liabilities and net assets / equity</td>
+                    <td><a href="/reports/official/statement-of-financial-position{% if selected_fiscal_year_id %}?fiscal_year_id={{ selected_fiscal_year_id }}{% endif %}">Open Official</a></td>
+                    <td><a href="/reports/official/statement-of-financial-position/print{% if selected_fiscal_year_id %}?fiscal_year_id={{ selected_fiscal_year_id }}{% endif %}" target="_blank">Print Official</a></td>
+                </tr>
+                <tr>
+                    <td>Statement of Financial Performance</td>
+                    <td>Revenue, expenses and surplus / deficit</td>
+                    <td><a href="/reports/official/statement-of-financial-performance{% if selected_fiscal_year_id %}?fiscal_year_id={{ selected_fiscal_year_id }}{% endif %}">Open Official</a></td>
+                    <td><a href="/reports/official/statement-of-financial-performance/print{% if selected_fiscal_year_id %}?fiscal_year_id={{ selected_fiscal_year_id }}{% endif %}" target="_blank">Print Official</a></td>
+                </tr>
+                <tr>
+                    <td>Budget vs Actual</td>
+                    <td>Statement of comparison of budget and actual amounts</td>
+                    <td>
+                        <a href="#" onclick="
+                            const fy='{{ selected_fiscal_year_id or '' }}';
+                            const bh=document.getElementById('budget_header_id').value;
+                            let url='/reports/official/budget-vs-actual';
+                            const params=[];
+                            if(fy){params.push('fiscal_year_id='+fy);}
+                            if(bh){params.push('budget_header_id='+bh);}
+                            if(params.length){url+='?'+params.join('&');}
+                            window.location=url;
+                            return false;
+                        ">Open Official</a>
+                    </td>
+                    <td>
+                        <a href="#" onclick="
+                            const fy='{{ selected_fiscal_year_id or '' }}';
+                            const bh=document.getElementById('budget_header_id').value;
+                            let url='/reports/official/budget-vs-actual/print';
+                            const params=[];
+                            if(fy){params.push('fiscal_year_id='+fy);}
+                            if(bh){params.push('budget_header_id='+bh);}
+                            if(params.length){url+='?'+params.join('&');}
+                            window.open(url,'_blank');
+                            return false;
+                        ">Print Official</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Budget Setup</td>
+                    <td>Create headers, manage lines, import and approve budgets</td>
+                    <td><a href="/budget">Open Budget Setup</a></td>
+                    <td><span>-</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

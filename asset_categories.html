@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Categories - AFYA ERP{% endblock %}
+{% block page_title %}Asset Categories{% endblock %}
+{% block page_subtitle %}Asset Management{% endblock %}
+
+{% block content %}
+
+<form method="post" class="page-card">
+  <h2 class="section-title">New Asset Category</h2>
+  {% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}
+  {% if success %}<div class="alert alert-success">Saved successfully.</div>{% endif %}
+  <div class="form-grid-3">
+    <div><label>Code</label><input name="code" required></div>
+    <div><label>Name</label><input name="name" required></div>
+    <div><label>Useful Life (Months)</label><input type="number" name="useful_life_months" value="60"></div>
+    <div><label>Depreciation Method</label><select name="depreciation_method"><option value="STRAIGHT_LINE">Straight Line</option></select></div>
+    <div><label>Asset GL</label><select name="gl_asset_account_id"><option value="">-- Select --</option>{% for a in gl_accounts %}<option value="{{ a.id }}">{{ a.code }} - {{ a.name }}</option>{% endfor %}</select></div>
+    <div><label>Accumulated Depreciation GL</label><select name="gl_accumulated_depreciation_account_id"><option value="">-- Select --</option>{% for a in gl_accounts %}<option value="{{ a.id }}">{{ a.code }} - {{ a.name }}</option>{% endfor %}</select></div>
+    <div><label>Depreciation Expense GL</label><select name="gl_depreciation_expense_account_id"><option value="">-- Select --</option>{% for a in gl_accounts %}<option value="{{ a.id }}">{{ a.code }} - {{ a.name }}</option>{% endfor %}</select></div>
+    <div><label>Disposal Gain GL</label><select name="gl_disposal_gain_account_id"><option value="">-- Select --</option>{% for a in gl_accounts %}<option value="{{ a.id }}">{{ a.code }} - {{ a.name }}</option>{% endfor %}</select></div>
+    <div><label>Disposal Loss GL</label><select name="gl_disposal_loss_account_id"><option value="">-- Select --</option>{% for a in gl_accounts %}<option value="{{ a.id }}">{{ a.code }} - {{ a.name }}</option>{% endfor %}</select></div>
+  </div>
+  <button type="submit">Save Category</button>
+</form>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>Method</th><th>Life</th><th>Status</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row.code }}</td><td>{{ row.name }}</td><td>{{ row.depreciation_method }}</td><td>{{ row.useful_life_months }}</td><td>{{ 'Active' if row.is_active else 'Inactive' }}</td></tr>{% else %}<tr><td colspan="5">No categories found.</td></tr>{% endfor %}</tbody></table></div></div>
+
+{% endblock %}

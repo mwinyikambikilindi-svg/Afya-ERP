@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications Center - AFYA ERP{% endblock %}
+{% block page_title %}Notifications Center{% endblock %}
+{% block page_subtitle %}Live operational alerts across finance, students and assets{% endblock %}
+
+{% block content %}
+<div class="notification-center-grid">
+  {% for card in cards %}
+  <div class="notification-card severity-{{ card.severity }}">
+    <div class="notification-card__title">{{ card.title }}</div>
+    <div class="notification-card__count">{{ card.count }}</div>
+    <div class="notification-card__desc">{{ card.description }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="notification-list-panel">
+  <div class="notification-list-panel__head">Priority Alerts</div>
+  <div class="notification-list-panel__body">
+    {% if items %}
+      {% for item in items %}
+      <a href="{{ item.url or '/notifications-center' }}" class="notification-row severity-{{ item.severity }}">
+        <div>
+          <div><strong>{{ item.title }}</strong></div>
+          <div class="notification-row__meta">{{ item.description }}</div>
+        </div>
+        <div class="notification-row__count">{{ item.count }}</div>
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">No high-priority alerts right now.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

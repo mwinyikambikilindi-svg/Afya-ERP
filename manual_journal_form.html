@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Manual Journal - AFYA ERP{% endblock %}
+{% block page_title %}Manual Journal{% endblock %}
+{% block page_subtitle %}Journal entry capture through compact data-entry window{% endblock %}
+{% block workspace_actions %}
+<a href="/journals" class="btn btn-secondary">Journal Register</a>
+<button type="button" data-modal-target="#journalEntryModal">Open Entry Window</button>
+{% endblock %}
+{% block content %}
+<div class="workspace-window">
+    <div class="window-toolbar">
+        <div>
+            <h2 class="window-title">Journal Workspace</h2>
+            <div class="window-subtitle">Use the button above to capture entries inside a mini-window.</div>
+        </div>
+        <div class="compact-pillbar">
+            <span class="compact-pill">Draft</span>
+            <span class="compact-pill">Pending Approval</span>
+            <span class="compact-pill">Posted</span>
+        </div>
+    </div>
+
+    {% if error_message %}<div class="alert alert-danger">{{ error_message }}</div>{% endif %}
+    {% if success_batch_id %}
+    <div class="alert alert-success">
+        Journal batch <strong>{{ success_batch_id }}</strong> processed successfully.
+        <a href="/journals/{{ success_batch_id }}">Open detail</a>
+    </div>
+    {% endif %}
+
+    <div class="grid-2">
+        <div class="table-card">
+            <h3 class="window-title">Entry guidance</h3>
+            <div class="info-list">
+                <div class="info-row"><div class="info-label">Save Draft</div><div>Stores entry without approval.</div></div>
+                <div class="info-row"><div class="info-label">Submit</div><div>Routes entry for approval.</div></div>
+                <div class="info-row"><div class="info-label">Approve &amp; Post</div><div>Admin can post immediately.</div></div>
+            </div>
+        </div>
+        <div class="table-card">
+            <h3 class="window-title">Quick actions</h3>
+            <div class="info-list">
+                <div class="info-row"><div class="info-label">New Entry</div><div><button type="button" data-modal-target="#journalEntryModal">Launch Window</button></div></div>
+                <div class="info-row"><div class="info-label">Register</div><div><a href="/journals">Open journal register</a></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="enterprise-modal is-open" id="journalEntryModal" data-auto-open="true">
+    <div class="modal-window modal-window--wide">
+        <div class="modal-header">
+            <div>
+                <h3 class="modal-title">Manual Journal Entry</h3>
+                <div class="modal-subtitle">Compact posting window inspired by enterprise government systems</div>
+            </div>
+            <button type="button" class="modal-close btn btn-secondary" data-modal-close>×</button>
+        </div>
+        <div class="modal-body">
+            <form method="post" id="manualJournalForm">
+                <div class="form-grid-4">
+                    <div>
+                        <label for="branch_id">Branch</label>
+                        <select name="branch_id" id="branch_id" required>
+                            <option value="">-- Select --</option>
+                            {% for branch in branches %}<option value="{{ branch.id }}">{{ branch.code }} - {{ branch.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="journal_date">Journal Date</label>
+                        <input type="date" name="journal_date" id="journal_date" value="{{ default_journal_date }}" required>
+                    </div>
+                    <div>
+                        <label for="reference_no">Reference No</label>
+                        <input type="text" name="reference_no" id="reference_no" placeholder="JV-REF-001">
+                    </div>
+                    <div>
+                        <label for="narration">Narration</label>
+                        <input type="text" name="narration" id="narration" placeholder="Brief journal narration">
+                    </div>
+                </div>
+
+                <div class="table-card" style="margin-top:10px;">
+                    <div class="window-toolbar">
+                        <h3 class="window-title">Journal Lines</h3>
+                        <button type="button" class="btn btn-secondary" onclick="addJournalRow()">+ Add Line</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="journalLinesTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:28%;">Account</th>
+                                    <th>Description</th>
+                                    <th style="width:12%;">Debit</th>
+                                    <th style="width:12%;">Credit</th>
+                                    <th style="width:7%;">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="journalLinesBody">
+                                {% for _ in range(2) %}
+                                <tr>
+                                    <td>
+                                        <select name="gl_account_id[]" required>
+                                            <option value="">-- Select account --</option>
+                                            {% for account in accounts %}<option value="{{ account.id }}">{{ account.code }} - {{ account.name }}</option>{% endfor %}
+                                        </select>
+                                    </td>
+                                    <td><input type="text" name="description[]" placeholder="Line description"></td>
+                                    <td><input type="number" step="0.01" min="0" name="debit_amount[]" value="0.00" oninput="calculateJournalTotals()"></td>
+                                    <td><input type="number" step="0.01" min="0" name="credit_amount[]" value="0.00" oninput="calculateJournalTotals()"></td>
+                                    <td><button type="button" class="btn btn-secondary" onclick="removeRow(this)">X</button></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="2" style="text-align:right;">Totals</th>
+                                    <th id="journalDebitTotal">0.00</th>
+                                    <th id="journalCreditTotal">0.00</th>
+                                    <th id="journalBalanceState">Not Balanced</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="action" value="save" class="btn btn-secondary">Save Draft</button>
+                    <button type="submit" name="action" value="submit" class="btn btn-warning">Submit</button>
+                    <button type="submit" name="action" value="post">Approve &amp; Post</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+function addJournalRow() {
+    const tbody = document.getElementById('journalLinesBody');
+    const firstRow = tbody.querySelector('tr');
+    const newRow = firstRow.cloneNode(true);
+    newRow.querySelectorAll('input').forEach((input) => {
+        input.value = (input.name === 'debit_amount[]' || input.name === 'credit_amount[]') ? '0.00' : '';
+    });
+    newRow.querySelectorAll('select').forEach((select) => { select.selectedIndex = 0; });
+    tbody.appendChild(newRow);
+    calculateJournalTotals();
+}
+function removeRow(button) {
+    const tbody = document.getElementById('journalLinesBody');
+    if (tbody.querySelectorAll('tr').length <= 2) return;
+    button.closest('tr').remove();
+    calculateJournalTotals();
+}
+function calculateJournalTotals() {
+    let totalDebit = 0, totalCredit = 0;
+    document.querySelectorAll('input[name="debit_amount[]"]').forEach((input) => { totalDebit += parseFloat(input.value || 0); });
+    document.querySelectorAll('input[name="credit_amount[]"]').forEach((input) => { totalCredit += parseFloat(input.value || 0); });
+    document.getElementById('journalDebitTotal').innerText = totalDebit.toFixed(2);
+    document.getElementById('journalCreditTotal').innerText = totalCredit.toFixed(2);
+    const balance = document.getElementById('journalBalanceState');
+    if (Math.abs(totalDebit - totalCredit) < 0.0001 && totalDebit > 0) {
+        balance.innerText = 'Balanced';
+        balance.style.color = '#2b8b57';
+    } else {
+        balance.innerText = 'Not Balanced';
+        balance.style.color = '#b54242';
+    }
+}
+calculateJournalTotals();
+</script>
+{% endblock %}
